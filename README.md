@@ -1,3 +1,47 @@
+## Deploy en Railway
+
+Esta app usa Docker para desplegarse en Railway.
+
+### 1) Variables requeridas en Railway
+
+Configura estas variables en tu servicio web:
+
+- `APP_NAME=Ferreteria`
+- `APP_ENV=production`
+- `APP_DEBUG=false`
+- `APP_URL=https://<tu-dominio-railway>`
+- `APP_KEY=base64:...` (genera una con `php artisan key:generate --show`)
+- `DB_CONNECTION=mysql`
+- `DB_HOST=<host de MySQL en Railway>`
+- `DB_PORT=3306`
+- `DB_DATABASE=<database>`
+- `DB_USERNAME=<username>`
+- `DB_PASSWORD=<password>`
+- `LOG_CHANNEL=stderr`
+- `SESSION_DRIVER=database`
+- `CACHE_STORE=database`
+- `QUEUE_CONNECTION=database`
+
+### 2) Base de datos
+
+- Agrega un servicio MySQL en Railway.
+- Conecta el servicio web a ese MySQL y copia sus variables al servicio web.
+
+### 3) Build y arranque
+
+- El `Dockerfile` ya compila assets (`npm run build`) y ejecuta `composer install --no-dev`.
+- El contenedor arranca con el puerto de Railway usando `PORT`.
+- Al iniciar, corre migraciones con `php artisan migrate --force`.
+
+### 4) Errores comunes al subir
+
+- **`Vite manifest not found`**: faltaba compilar assets en Docker.
+- **App no inicia por puerto**: el proceso debe escuchar `0.0.0.0:$PORT`.
+- **Error de cifrado / sesión**: `APP_KEY` no configurada.
+- **Error de conexión DB**: `DB_*` incorrectas o MySQL no vinculado.
+
+---
+
 <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
 <p align="center">
