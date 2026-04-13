@@ -20,6 +20,11 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+Route::get('/bitacora', function() {
+    $registros = \App\Models\Bitacora::orderBy('created_at', 'desc')->get();
+    return view('bitacora', compact('registros'));
+});
+
 require __DIR__.'/auth.php';
 
 // 4. Rutas para tus Casos de Uso (CRUD completo)

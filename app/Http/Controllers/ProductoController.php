@@ -36,10 +36,16 @@ class ProductoController extends Controller
      */
     public function store(Request $request)
     {
-        // 2. Guardar datos: Recibe la info del formulario y crea el producto en MySQL
-        \App\Models\Producto::create($request->all());
-        
-        // Recarga la página para que el usuario vea el nuevo producto en la lista
+        $producto = \App\Models\Producto::create($request->all());
+
+        // REGISTRO EN BITÁCORA
+        \App\Models\Bitacora::registrar(
+            'INSERTAR', 
+            'producto', 
+            $producto->idproducto, 
+            "Se creó el producto: {$producto->nombre}"
+        );
+
         return redirect()->back();
     }
 

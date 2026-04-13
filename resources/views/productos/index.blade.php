@@ -27,6 +27,10 @@
             <a href="{{ route('login') }}" style="margin-right: 15px; text-decoration: none; color: #007bff; font-weight: bold;">Iniciar Sesión</a>
             <a href="{{ route('register') }}" style="text-decoration: none; color: #28a745; font-weight: bold;">Registrarse</a>
         @endauth
+
+        @auth
+            <a href="{{ url('/bitacora') }}" style="margin-right: 15px; text-decoration: none; color: #6610f2; font-weight: bold;">📋 Bitácora</a>
+        @endauth
     </div>
 
     <h1>Gestión de Inventario - Ferretería</h1>
