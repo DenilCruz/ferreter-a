@@ -14,15 +14,21 @@
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="font-sans text-gray-900 antialiased">
-        <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100">
-            <div>
-                <a href="/">
-                    <x-application-logo class="w-20 h-20 fill-current text-gray-500" />
+    <body class="font-sans text-slate-800 antialiased">
+        <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gradient-to-br from-slate-200 via-slate-100 to-sky-100 px-4">
+            <div class="w-full sm:max-w-md mt-2 mb-2 text-center">
+                <a href="{{ url('/') }}" class="text-sm font-semibold text-teal-700 hover:text-teal-600 transition">
+                    ← {{ __('Volver al inventario') }}
                 </a>
             </div>
 
-            <div class="w-full sm:max-w-md mt-6 px-6 py-4 bg-white shadow-md overflow-hidden sm:rounded-lg">
+            <div>
+                <a href="{{ url('/') }}" class="inline-block">
+                    <x-application-logo class="w-20 h-20 fill-current text-teal-700" />
+                </a>
+            </div>
+
+            <div class="w-full sm:max-w-md mt-6 px-6 py-6 bg-white/95 backdrop-blur-sm border border-slate-200/80 shadow-lg overflow-hidden sm:rounded-xl">
                 {{ $slot }}
             </div>
         </div>
