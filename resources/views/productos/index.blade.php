@@ -86,17 +86,45 @@
             color: var(--text);
         }
         .form-grid {
-            display: flex;
-            flex-wrap: wrap;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             gap: 10px;
-            align-items: center;
+            align-items: start;
         }
+        .field { display: flex; flex-direction: column; gap: 6px; }
         .form-grid input, .form-grid select {
             padding: 10px 12px;
             border: 1px solid #cbd5e1;
             border-radius: 8px;
             font-size: 0.9rem;
-            min-width: 120px;
+            min-width: 0;
+            width: 100%;
+        }
+        .field input.is-invalid, .field select.is-invalid {
+            border-color: #dc2626;
+            box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15);
+        }
+        .error-text {
+            color: #b91c1c;
+            font-size: 0.8rem;
+            margin: 0;
+        }
+        .alert {
+            border-radius: 10px;
+            padding: 12px 14px;
+            margin-bottom: 14px;
+            font-size: 0.9rem;
+            border: 1px solid transparent;
+        }
+        .alert-error {
+            background: #fef2f2;
+            color: #991b1b;
+            border-color: #fecaca;
+        }
+        .alert-success {
+            background: #ecfdf5;
+            color: #065f46;
+            border-color: #a7f3d0;
         }
         .form-grid input:focus, .form-grid select:focus {
             outline: none;
@@ -112,6 +140,7 @@
             cursor: pointer;
             font-weight: 600;
             box-shadow: 0 2px 6px rgba(15, 118, 110, 0.35);
+            align-self: end;
         }
         .btn-save:hover { filter: brightness(1.06); }
         .catalog {
@@ -188,23 +217,68 @@
 
         <div class="form-container">
             <h3>Agregar producto</h3>
+            @if (session('success'))
+                <div class="alert alert-success">
+                    {{ session('success') }}
+                </div>
+            @endif
+            @if ($errors->has('form'))
+                <div class="alert alert-error">
+                    {{ $errors->first('form') }}
+                </div>
+            @endif
             <form action="{{ route('productos.store') }}" method="POST">
                 @csrf
                 <div class="form-grid">
-                    <input type="number" name="idproducto" placeholder="ID producto" required>
-                    <input type="text" name="nombre" placeholder="Nombre" required>
-                    <input type="text" name="descripcion" placeholder="Descripción">
-                    <input type="number" step="0.01" name="precio" placeholder="Precio (Bs)" required>
-                    <input type="number" name="cantidad" placeholder="Stock inicial" required>
-                    <input type="number" name="id_marca" placeholder="ID marca" required>
-                    <select name="id_categoria" required>
-                        <option value="">— Categoría —</option>
-                        @foreach($categorias_formulario as $cat)
-                            <option value="{{ $cat->idcategoria }}">
-                                {{ $cat->id_categoria_padre ? '— ' : '' }}{{ $cat->nombre }}
-                            </option>
-                        @endforeach
-                    </select>
+                    <div class="field">
+                        <input type="number" name="idproducto" value="{{ old('idproducto') }}" placeholder="ID producto" class="@error('idproducto') is-invalid @enderror" required>
+                        @error('idproducto')
+                            <p class="error-text">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <div class="field">
+                        <input type="text" name="nombre" value="{{ old('nombre') }}" placeholder="Nombre" class="@error('nombre') is-invalid @enderror" required>
+                        @error('nombre')
+                            <p class="error-text">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <div class="field">
+                        <input type="text" name="descripcion" value="{{ old('descripcion') }}" placeholder="Descripción" class="@error('descripcion') is-invalid @enderror">
+                        @error('descripcion')
+                            <p class="error-text">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <div class="field">
+                        <input type="number" step="0.01" name="precio" value="{{ old('precio') }}" placeholder="Precio (Bs)" class="@error('precio') is-invalid @enderror" required>
+                        @error('precio')
+                            <p class="error-text">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <div class="field">
+                        <input type="number" name="cantidad" value="{{ old('cantidad') }}" placeholder="Stock inicial" class="@error('cantidad') is-invalid @enderror" required>
+                        @error('cantidad')
+                            <p class="error-text">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <div class="field">
+                        <input type="number" name="id_marca" value="{{ old('id_marca') }}" placeholder="ID marca" class="@error('id_marca') is-invalid @enderror" required>
+                        @error('id_marca')
+                            <p class="error-text">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <div class="field">
+                        <select name="id_categoria" class="@error('id_categoria') is-invalid @enderror" required>
+                            <option value="">— Categoría —</option>
+                            @foreach($categorias_formulario as $cat)
+                                <option value="{{ $cat->idcategoria }}" {{ old('id_categoria') == $cat->idcategoria ? 'selected' : '' }}>
+                                    {{ $cat->id_categoria_padre ? '— ' : '' }}{{ $cat->nombre }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('id_categoria')
+                            <p class="error-text">{{ $message }}</p>
+                        @enderror
+                    </div>
                     <button type="submit" class="btn-save">Guardar</button>
                 </div>
             </form>
