@@ -23,7 +23,7 @@
 
             <!-- Settings Dropdown -->
             <div class="hidden sm:flex sm:items-center sm:ms-6">
-                <x-dropdown align="right" width="48">
+                <x-dropdown align="right" width="48" contentClasses="py-1 bg-white text-slate-700">
                     <x-slot name="trigger">
                         <button class="inline-flex items-center px-3 py-2 border border-slate-200 text-sm leading-4 font-medium rounded-lg text-slate-600 bg-white hover:text-teal-800 hover:border-teal-200 focus:outline-none focus:ring-2 focus:ring-teal-500/30 transition ease-in-out duration-150">
                             <div>{{ Auth::user()->name }}</div>
@@ -37,6 +37,11 @@
                     </x-slot>
 
                     <x-slot name="content">
+                        <div class="px-4 py-2 border-b border-slate-100">
+                            <p class="text-sm font-medium text-slate-800">{{ Auth::user()->name }}</p>
+                            <p class="text-xs text-slate-500">{{ Auth::user()->email }}</p>
+                        </div>
+
                         <x-dropdown-link :href="route('profile.edit')">
                             {{ __('Profile') }}
                         </x-dropdown-link>
