@@ -3,6 +3,8 @@
 .env
 .env.*
 node_modules
+/public/hot
+/public/build
 vendor
 storage/logs
 storage/framework/cache/*
