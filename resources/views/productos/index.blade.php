@@ -193,6 +193,29 @@
             background: #fafafa;
         }
         .tree-table tr:last-child td { border-bottom: none; }
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+        .btn-action {
+            background: var(--surface);
+            color: var(--accent);
+            border: 2px solid var(--accent);
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+        .btn-action:hover, .btn-action.active {
+            background: var(--accent);
+            color: #fff;
+        }
+        .d-none {
+            display: none !important;
+        }
     </style>
 </head>
 <body>
@@ -215,7 +238,12 @@
         <h1>Inventario</h1>
         <p class="subtitle">Ferretería Guisella — catálogo y altas de producto</p>
 
-        <div class="form-container">
+        <div class="action-buttons">
+            <button class="btn-action" id="btn-toggle-agregar" onclick="toggleForm('agregar')">Agregar producto</button>
+            <button class="btn-action" id="btn-toggle-modificar" onclick="toggleForm('modificar')">Modificar producto</button>
+        </div>
+
+        <div class="form-container d-none" id="container-agregar">
             <h3>Agregar producto</h3>
             @if (session('success'))
                 <div class="alert alert-success">
@@ -284,6 +312,51 @@
             </form>
         </div>
 
+        <div class="form-container d-none" id="container-modificar">
+            <h3>Modificar producto</h3>
+            <p id="modificar-error-msg" class="error-text d-none" style="margin-bottom: 12px;"></p>
+            @if ($errors->has('form_modificar'))
+                <div class="alert alert-error">
+                    {{ $errors->first('form_modificar') }}
+                </div>
+            @endif
+            <form id="form-modificar" action="{{ url('productos') }}" method="POST">
+                @csrf
+                @method('PUT')
+                <div class="form-grid">
+                    <div class="field">
+                        <input type="number" id="idproducto-modificar" name="idproducto" placeholder="ID producto a modificar" required>
+                    </div>
+                    <div class="field">
+                        <input type="text" id="modnombre" name="nombre" placeholder="Nombre" required>
+                    </div>
+                    <div class="field">
+                        <input type="text" id="moddescripcion" name="descripcion" placeholder="Descripción">
+                    </div>
+                    <div class="field">
+                        <input type="number" step="0.01" id="modprecio" name="precio" placeholder="Precio (Bs)" required>
+                    </div>
+                    <div class="field">
+                        <input type="number" id="modcantidad" name="cantidad" placeholder="Stock" required>
+                    </div>
+                    <div class="field">
+                        <input type="number" id="modmarca" name="id_marca" placeholder="ID marca" required>
+                    </div>
+                    <div class="field">
+                        <select id="modcategoria" name="id_categoria" required>
+                            <option value="">— Categoría —</option>
+                            @foreach($categorias_formulario as $cat)
+                                <option value="{{ $cat->idcategoria }}">
+                                    {{ $cat->id_categoria_padre ? '— ' : '' }}{{ $cat->nombre }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <button type="submit" class="btn-save">Actualizar</button>
+                </div>
+            </form>
+        </div>
+
         <div class="catalog">
             <h2>Catálogo</h2>
             <p class="hint">Despliega cada categoría para ver productos y subcategorías.</p>
@@ -293,4 +366,61 @@
         </div>
     </div>
 </body>
+<script>
+    function toggleForm(tipo) {
+        document.getElementById('container-agregar').classList.add('d-none');
+        document.getElementById('container-modificar').classList.add('d-none');
+        document.getElementById('btn-toggle-agregar').classList.remove('active');
+        document.getElementById('btn-toggle-modificar').classList.remove('active');
+
+        if (tipo !== 'ninguno') {
+            document.getElementById('container-' + tipo).classList.remove('d-none');
+            document.getElementById('btn-toggle-' + tipo).classList.add('active');
+        }
+    }
+
+    // Al arrancar, si hay errores form, abrimos agregar. Si de form_modificar abrimos modificar.
+    @if(session('success') && !request()->has('modificar'))
+        toggleForm('agregar');
+    @elseif($errors->has('form'))
+        toggleForm('agregar');
+    @elseif($errors->has('form_modificar') || request()->has('modificar'))
+        toggleForm('modificar');
+    @endif
+
+    document.getElementById('idproducto-modificar').addEventListener('input', function() {
+        clearTimeout(window.modificarTimeout);
+        let errorMsg = document.getElementById('modificar-error-msg');
+        errorMsg.classList.add('d-none');
+        errorMsg.textContent = '';
+        
+        let id = this.value;
+        if (!id) return;
+
+        window.modificarTimeout = setTimeout(() => {
+            fetch('/api/producto/' + id)
+                .then(res => res.json())
+                .then(data => {
+                    if(data.success) {
+                        let p = data.producto;
+                        document.getElementById('modnombre').value = p.nombre;
+                        document.getElementById('moddescripcion').value = p.descripcion || '';
+                        document.getElementById('modprecio').value = p.precio;
+                        document.getElementById('modcantidad').value = p.cantidad;
+                        document.getElementById('modmarca').value = p.id_marca;
+                        document.getElementById('modcategoria').value = p.id_categoria;
+                        // Forzar el endpoint correcto en el formulario
+                        document.getElementById('form-modificar').action = "{{ url('productos') }}/" + id + "?modificar=1";
+                    } else {
+                        errorMsg.textContent = 'Ese producto no existe.';
+                        errorMsg.classList.remove('d-none');
+                    }
+                })
+                .catch(err => {
+                    errorMsg.textContent = 'Error al buscar el producto.';
+                    errorMsg.classList.remove('d-none');
+                });
+        }, 500); 
+    });
+</script>
 </html>

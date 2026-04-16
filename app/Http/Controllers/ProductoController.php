@@ -108,12 +108,56 @@ class ProductoController extends Controller
         //
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, string $id)
     {
-        //
+        $validated = $request->validate(
+            [
+                'nombre' => ['required', 'string', 'max:255'],
+                'descripcion' => ['nullable', 'string', 'max:500'],
+                'precio' => ['required', 'numeric', 'min:0'],
+                'cantidad' => ['required', 'integer', 'min:0'],
+                'id_marca' => ['required', 'integer', 'exists:marca,id'],
+                'id_categoria' => ['required', 'integer', 'exists:categoria,idcategoria'],
+            ],
+            [
+                'nombre.required' => 'El nombre del producto es obligatorio.',
+                'precio.required' => 'El precio es obligatorio.',
+                'cantidad.required' => 'La cantidad es obligatoria.',
+                'id_marca.required' => 'El ID de marca es obligatorio.',
+                'id_categoria.required' => 'Debes seleccionar una categoría.',
+            ]
+        );
+
+        try {
+            $producto = \App\Models\Producto::where('idproducto', $id)->firstOrFail();
+            $producto->update($validated);
+
+            // REGISTRO EN BITÁCORA
+            \App\Models\Bitacora::registrar(
+                'ACTUALIZAR',
+                'producto',
+                $producto->idproducto,
+                "Se actualizó el producto: {$producto->nombre}"
+            );
+
+            return redirect()->back()->with('success', 'Producto actualizado correctamente.');
+        } catch (\Exception $e) {
+            return redirect()
+                ->back()
+                ->withInput()
+                ->withErrors([
+                    'form_modificar' => 'No se pudo actualizar el producto. Verifica los datos ingresados e intenta nuevamente.',
+                ]);
+        }
+    }
+
+    public function getProducto($id)
+    {
+        $producto = \App\Models\Producto::where('idproducto', $id)->first();
+        if ($producto) {
+            return response()->json(['success' => true, 'producto' => $producto]);
+        }
+        return response()->json(['success' => false, 'message' => 'Producto no encontrado'], 404);
     }
 
     /**

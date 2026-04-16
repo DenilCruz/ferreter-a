@@ -28,5 +28,6 @@ Route::get('/bitacora', function() {
 require __DIR__.'/auth.php';
 
 // 4. Rutas para tus Casos de Uso (CRUD completo)
+Route::get('/api/producto/{id}', [ProductoController::class, 'getProducto']);
 Route::resource('productos', ProductoController::class);
 Route::resource('usuarios', UsuarioController::class);
