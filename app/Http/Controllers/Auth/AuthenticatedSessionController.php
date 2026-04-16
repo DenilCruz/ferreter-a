@@ -28,6 +28,8 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        \App\Models\Bitacora::registrar('Login', 'users', Auth::id(), 'Inicio de sesión exitoso');
+
         return redirect()->intended(route('dashboard', absolute: false));
     }
 
@@ -36,6 +38,10 @@ class AuthenticatedSessionController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
+        if (Auth::check()) {
+            \App\Models\Bitacora::registrar('Logout', 'users', Auth::id(), 'Cierre de sesión exitoso');
+        }
+
         Auth::guard('web')->logout();
 
         $request->session()->invalidate();
