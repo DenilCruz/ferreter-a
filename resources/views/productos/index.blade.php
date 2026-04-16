@@ -307,6 +307,30 @@
                             <p class="error-text">{{ $message }}</p>
                         @enderror
                     </div>
+                    <div class="field">
+                        <input type="date" name="fechacaducidad" value="{{ old('fechacaducidad') }}" placeholder="Fecha Caducidad" class="@error('fechacaducidad') is-invalid @enderror">
+                        @error('fechacaducidad')
+                            <p class="error-text">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <div class="field">
+                        <input type="number" name="idcolor" value="{{ old('idcolor') }}" placeholder="ID Color" class="@error('idcolor') is-invalid @enderror">
+                        @error('idcolor')
+                            <p class="error-text">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <div class="field">
+                        <input type="number" name="idmedida" value="{{ old('idmedida') }}" placeholder="ID Medida" class="@error('idmedida') is-invalid @enderror">
+                        @error('idmedida')
+                            <p class="error-text">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <div class="field">
+                        <input type="number" name="idvolumen" value="{{ old('idvolumen') }}" placeholder="ID Volumen" class="@error('idvolumen') is-invalid @enderror">
+                        @error('idvolumen')
+                            <p class="error-text">{{ $message }}</p>
+                        @enderror
+                    </div>
                     <button type="submit" class="btn-save">Guardar</button>
                 </div>
             </form>
@@ -351,6 +375,18 @@
                                 </option>
                             @endforeach
                         </select>
+                    </div>
+                    <div class="field">
+                        <input type="date" id="modfechacaducidad" name="fechacaducidad" placeholder="Fecha Caducidad">
+                    </div>
+                    <div class="field">
+                        <input type="number" id="modcolor" name="idcolor" placeholder="ID Color">
+                    </div>
+                    <div class="field">
+                        <input type="number" id="modmedida" name="idmedida" placeholder="ID Medida">
+                    </div>
+                    <div class="field">
+                        <input type="number" id="modvolumen" name="idvolumen" placeholder="ID Volumen">
                     </div>
                     <button type="submit" class="btn-save">Actualizar</button>
                 </div>
@@ -409,6 +445,10 @@
                         document.getElementById('modcantidad').value = p.cantidad;
                         document.getElementById('modmarca').value = p.id_marca;
                         document.getElementById('modcategoria').value = p.id_categoria;
+                        document.getElementById('modfechacaducidad').value = p.fechacaducidad || '';
+                        document.getElementById('modcolor').value = p.idcolor || '';
+                        document.getElementById('modmedida').value = p.idmedida || '';
+                        document.getElementById('modvolumen').value = p.idvolumen || '';
                         // Forzar el endpoint correcto en el formulario
                         document.getElementById('form-modificar').action = "{{ url('productos') }}/" + id + "?modificar=1";
                     } else {

@@ -10,7 +10,7 @@ class Producto extends Model
     protected $primaryKey = 'idproducto';
     public $timestamps = false;
     // Esto permite que Laravel inserte datos en estos campos
-    protected $fillable = ['idproducto', 'nombre', 'descripcion', 'precio', 'cantidad', 'id_categoria', 'id_marca'];
+    protected $fillable = ['idproducto', 'nombre', 'descripcion', 'precio', 'cantidad', 'id_categoria', 'id_marca', 'fechacaducidad', 'idcolor', 'idmedida', 'idvolumen'];
 
     public function categoria()
     {

@@ -46,6 +46,10 @@ class ProductoController extends Controller
                 'cantidad' => ['required', 'integer', 'min:0'],
                 'id_marca' => ['required', 'integer', 'exists:marca,id'],
                 'id_categoria' => ['required', 'integer', 'exists:categoria,idcategoria'],
+                'fechacaducidad' => ['nullable', 'date'],
+                'idcolor' => ['nullable', 'integer'],
+                'idmedida' => ['nullable', 'integer'],
+                'idvolumen' => ['nullable', 'integer'],
             ],
             [
                 'idproducto.required' => 'El ID del producto es obligatorio.',
@@ -118,6 +122,10 @@ class ProductoController extends Controller
                 'cantidad' => ['required', 'integer', 'min:0'],
                 'id_marca' => ['required', 'integer', 'exists:marca,id'],
                 'id_categoria' => ['required', 'integer', 'exists:categoria,idcategoria'],
+                'fechacaducidad' => ['nullable', 'date'],
+                'idcolor' => ['nullable', 'integer'],
+                'idmedida' => ['nullable', 'integer'],
+                'idvolumen' => ['nullable', 'integer'],
             ],
             [
                 'nombre.required' => 'El nombre del producto es obligatorio.',
