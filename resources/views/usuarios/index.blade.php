@@ -281,11 +281,17 @@
                         document.getElementById('moddomicilio').value = u.domicilio || '';
                         document.getElementById('modtipo').value = u.tipoPersona || '';
                         
-                        document.getElementById('form-modificar').action = "{{ url('usuarios') }}/" + ci;
+                        // Forzar el endpoint correcto en el formulario
+                        document.getElementById('form-modificar').action = "{{ url('usuarios') }}/" + encodeURIComponent(ci);
                     } else {
                         errorMsg.textContent = 'Ese carnet no está en las listas.';
                         errorMsg.classList.remove('d-none');
                     }
+                })
+                .catch(err => {
+                    console.error("Fetch error:", err);
+                    errorMsg.textContent = 'Error de conexión o datos no válidos.';
+                    errorMsg.classList.remove('d-none');
                 });
         }, 500); 
     });

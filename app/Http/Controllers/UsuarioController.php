@@ -93,7 +93,7 @@ class UsuarioController extends Controller
             }
 
             // 3. Registrar Accion en Bitacora
-            Bitacora::registrar('MODIFICAR', 'usuario');
+            Bitacora::registrar('MODIFICAR', 'usuario', $ci, 'Modificación de perfil y Auth');
 
             DB::commit();
 
@@ -124,7 +124,7 @@ class UsuarioController extends Controller
             $usuario->delete();
 
             // 3. Apuntar limpieza en libro de registro
-            Bitacora::registrar('ELIMINAR', 'usuario');
+            Bitacora::registrar('ELIMINAR', 'usuario', $correoBorrar, 'Usuario y accesos eliminados');
 
             DB::commit();
 
