@@ -315,20 +315,20 @@
                         @enderror
                     </div>
                     <div class="field">
-                        <input type="number" name="idcolor" value="{{ old('idcolor') }}" placeholder="ID Color" class="@error('idcolor') is-invalid @enderror">
-                        @error('idcolor')
+                        <input type="number" name="id_color" value="{{ old('id_color') }}" placeholder="ID Color" class="@error('id_color') is-invalid @enderror">
+                        @error('id_color')
                             <p class="error-text">{{ $message }}</p>
                         @enderror
                     </div>
                     <div class="field">
-                        <input type="number" name="idmedida" value="{{ old('idmedida') }}" placeholder="ID Medida" class="@error('idmedida') is-invalid @enderror">
-                        @error('idmedida')
+                        <input type="number" name="id_medida" value="{{ old('id_medida') }}" placeholder="ID Medida" class="@error('id_medida') is-invalid @enderror">
+                        @error('id_medida')
                             <p class="error-text">{{ $message }}</p>
                         @enderror
                     </div>
                     <div class="field">
-                        <input type="number" name="idvolumen" value="{{ old('idvolumen') }}" placeholder="ID Volumen" class="@error('idvolumen') is-invalid @enderror">
-                        @error('idvolumen')
+                        <input type="number" name="id_volumen" value="{{ old('id_volumen') }}" placeholder="ID Volumen" class="@error('id_volumen') is-invalid @enderror">
+                        @error('id_volumen')
                             <p class="error-text">{{ $message }}</p>
                         @enderror
                     </div>
@@ -381,13 +381,13 @@
                         <input type="date" id="modfechacaducidad" name="fechacaducidad" placeholder="Fecha Caducidad">
                     </div>
                     <div class="field">
-                        <input type="number" id="modcolor" name="idcolor" placeholder="ID Color">
+                        <input type="number" id="modcolor" name="id_color" placeholder="ID Color">
                     </div>
                     <div class="field">
-                        <input type="number" id="modmedida" name="idmedida" placeholder="ID Medida">
+                        <input type="number" id="modmedida" name="id_medida" placeholder="ID Medida">
                     </div>
                     <div class="field">
-                        <input type="number" id="modvolumen" name="idvolumen" placeholder="ID Volumen">
+                        <input type="number" id="modvolumen" name="id_volumen" placeholder="ID Volumen">
                     </div>
                     <button type="submit" class="btn-save">Actualizar</button>
                 </div>
@@ -479,9 +479,9 @@
                         document.getElementById('modmarca').value = p.id_marca;
                         document.getElementById('modcategoria').value = p.id_categoria;
                         document.getElementById('modfechacaducidad').value = p.fechacaducidad || '';
-                        document.getElementById('modcolor').value = p.idcolor || '';
-                        document.getElementById('modmedida').value = p.idmedida || '';
-                        document.getElementById('modvolumen').value = p.idvolumen || '';
+                        document.getElementById('modcolor').value = p.id_color || '';
+                        document.getElementById('modmedida').value = p.id_medida || '';
+                        document.getElementById('modvolumen').value = p.id_volumen || '';
                         // Forzar el endpoint correcto en el formulario
                         document.getElementById('form-modificar').action = "{{ url('productos') }}/" + id + "?modificar=1";
                     } else {
