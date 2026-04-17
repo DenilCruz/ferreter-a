@@ -238,6 +238,7 @@
         <h1>Ferretería Guisella — catálogo y altas de producto</h1>
         <p class="subtitle">Inventario</p>
 
+        @auth
         <div class="action-buttons">
             <button class="btn-action" id="btn-toggle-agregar" onclick="toggleForm('agregar')">Agregar producto</button>
             <button class="btn-action" id="btn-toggle-modificar" onclick="toggleForm('modificar')">Modificar producto</button>
@@ -419,6 +420,8 @@
                 </div>
             </form>
         </div>
+
+        @endauth
 
         <div class="catalog">
             <h2>Catálogo</h2>
