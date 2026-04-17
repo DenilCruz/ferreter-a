@@ -23,5 +23,9 @@ class AppServiceProvider extends ServiceProvider
         if ($this->app->environment('production')) {
             URL::forceScheme('https');
         }
+
+        \Illuminate\Support\Facades\Gate::define('admin', function ($user) {
+            return $user->email === 'admi@gmail.com';
+        });
     }
 }

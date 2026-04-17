@@ -31,3 +31,10 @@ require __DIR__.'/auth.php';
 Route::get('/api/producto/{id}', [ProductoController::class, 'getProducto']);
 Route::resource('productos', ProductoController::class);
 Route::resource('usuarios', UsuarioController::class);
+
+// 5. Rutas de Trabajos y Asignaciones
+Route::middleware('auth')->group(function () {
+    Route::get('/trabajos', [\App\Http\Controllers\TrabajoController::class, 'index'])->name('trabajos.index');
+    Route::post('/trabajos/rol', [\App\Http\Controllers\TrabajoController::class, 'store'])->name('trabajos.store');
+    Route::post('/trabajos/asignar', [\App\Http\Controllers\TrabajoController::class, 'asignar'])->name('trabajos.asignar');
+});

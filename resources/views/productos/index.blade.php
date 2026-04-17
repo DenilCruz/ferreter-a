@@ -222,6 +222,7 @@
     <div class="topbar">
         @auth
             <span>Hola, {{ Auth::user()->name }}</span>
+            <a href="{{ url('/trabajos') }}">Trabajos Asignados</a>
             <a href="{{ url('/dashboard') }}">Mi perfil</a>
             <a href="{{ url('/bitacora') }}">Bitácora</a>
             <form method="POST" action="{{ route('logout') }}" style="display: inline; margin: 0;">
