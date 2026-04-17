@@ -235,12 +235,13 @@
     </div>
 
     <div class="wrap">
-        <h1>Inventario</h1>
-        <p class="subtitle">Ferretería Guisella — catálogo y altas de producto</p>
+        <h1>Ferretería Guisella — catálogo y altas de producto</h1>
+        <p class="subtitle">Inventario</p>
 
         <div class="action-buttons">
             <button class="btn-action" id="btn-toggle-agregar" onclick="toggleForm('agregar')">Agregar producto</button>
             <button class="btn-action" id="btn-toggle-modificar" onclick="toggleForm('modificar')">Modificar producto</button>
+            <button class="btn-action" id="btn-toggle-eliminar" onclick="toggleForm('eliminar')" style="color: var(--danger); border-color: var(--danger);">Eliminar producto</button>
         </div>
 
         <div class="form-container d-none" id="container-agregar">
@@ -393,6 +394,32 @@
             </form>
         </div>
 
+        <div class="form-container d-none" id="container-eliminar" style="border-color: #fca5a5; background-color: #fef2f2;">
+            <h3 style="color: var(--danger);">Eliminar producto</h3>
+            <p id="eliminar-error-msg" class="error-text d-none" style="margin-bottom: 12px;"></p>
+            @if ($errors->has('form_eliminar'))
+                <div class="alert alert-error">
+                    {{ $errors->first('form_eliminar') }}
+                </div>
+            @endif
+            <form id="form-eliminar" action="{{ url('productos') }}" method="POST">
+                @csrf
+                @method('DELETE')
+                <div class="form-grid">
+                    <div class="field">
+                        <input type="number" id="idproducto-eliminar" name="idproducto" placeholder="ID producto a eliminar" required style="border-color: #fca5a5;">
+                    </div>
+                    <div class="field">
+                        <input type="text" id="elnombre" placeholder="Nombre (auto)" readonly style="background:#f1f5f9; cursor:not-allowed;">
+                    </div>
+                    <div class="field">
+                        <input type="text" id="elprecio" placeholder="Precio (auto)" readonly style="background:#f1f5f9; cursor:not-allowed;">
+                    </div>
+                    <button type="submit" class="btn-logout" onclick="return confirm('¿Estás seguro de que deseas eliminar este producto? Esta acción no se puede deshacer.');" style="grid-column: 1 / -1; margin-top:10px; width: 100%;">Eliminar permanentemente</button>
+                </div>
+            </form>
+        </div>
+
         <div class="catalog">
             <h2>Catálogo</h2>
             <p class="hint">Despliega cada categoría para ver productos y subcategorías.</p>
@@ -406,8 +433,10 @@
     function toggleForm(tipo) {
         document.getElementById('container-agregar').classList.add('d-none');
         document.getElementById('container-modificar').classList.add('d-none');
+        document.getElementById('container-eliminar').classList.add('d-none');
         document.getElementById('btn-toggle-agregar').classList.remove('active');
         document.getElementById('btn-toggle-modificar').classList.remove('active');
+        document.getElementById('btn-toggle-eliminar').classList.remove('active');
 
         if (tipo !== 'ninguno') {
             document.getElementById('container-' + tipo).classList.remove('d-none');
@@ -416,12 +445,16 @@
     }
 
     // Al arrancar, si hay errores form, abrimos agregar. Si de form_modificar abrimos modificar.
-    @if(session('success') && !request()->has('modificar'))
+    @if(session('success') && request()->has('eliminar'))
+        // No abrir forms si se eliminó con exito
+    @elseif(session('success') && !request()->has('modificar'))
         toggleForm('agregar');
     @elseif($errors->has('form'))
         toggleForm('agregar');
     @elseif($errors->has('form_modificar') || request()->has('modificar'))
         toggleForm('modificar');
+    @elseif($errors->has('form_eliminar'))
+        toggleForm('eliminar');
     @endif
 
     document.getElementById('idproducto-modificar').addEventListener('input', function() {
@@ -454,6 +487,42 @@
                     } else {
                         errorMsg.textContent = 'Ese producto no existe.';
                         errorMsg.classList.remove('d-none');
+                    }
+                })
+                .catch(err => {
+                    errorMsg.textContent = 'Error al buscar el producto.';
+                    errorMsg.classList.remove('d-none');
+                });
+        }, 500); 
+    });
+
+    document.getElementById('idproducto-eliminar').addEventListener('input', function() {
+        clearTimeout(window.eliminarTimeout);
+        let errorMsg = document.getElementById('eliminar-error-msg');
+        errorMsg.classList.add('d-none');
+        errorMsg.textContent = '';
+        
+        let id = this.value;
+        if (!id) {
+            document.getElementById('elnombre').value = '';
+            document.getElementById('elprecio').value = '';
+            return;
+        }
+
+        window.eliminarTimeout = setTimeout(() => {
+            fetch('/api/producto/' + id)
+                .then(res => res.json())
+                .then(data => {
+                    if(data.success) {
+                        let p = data.producto;
+                        document.getElementById('elnombre').value = p.nombre;
+                        document.getElementById('elprecio').value = p.precio + ' Bs';
+                        document.getElementById('form-eliminar').action = "{{ url('productos') }}/" + id + "?eliminar=1";
+                    } else {
+                        errorMsg.textContent = 'Ese producto no existe.';
+                        errorMsg.classList.remove('d-none');
+                        document.getElementById('elnombre').value = '';
+                        document.getElementById('elprecio').value = '';
                     }
                 })
                 .catch(err => {

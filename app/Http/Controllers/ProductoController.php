@@ -168,11 +168,28 @@ class ProductoController extends Controller
         return response()->json(['success' => false, 'message' => 'Producto no encontrado'], 404);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(string $id)
     {
-        //
+        try {
+            $producto = \App\Models\Producto::where('idproducto', $id)->firstOrFail();
+            $nombre = $producto->nombre;
+            $producto->delete();
+
+            // REGISTRO EN BITÁCORA
+            \App\Models\Bitacora::registrar(
+                'ELIMINAR',
+                'producto',
+                $id,
+                "Se eliminó el producto: {$nombre}"
+            );
+
+            return redirect()->back()->with('success', 'Producto eliminado correctamente.');
+        } catch (\Exception $e) {
+            return redirect()
+                ->back()
+                ->withErrors([
+                    'form_eliminar' => 'No se pudo eliminar el producto. Verifica que no existan otras referencias a este antes de eliminarlo.',
+                ]);
+        }
     }
 }
