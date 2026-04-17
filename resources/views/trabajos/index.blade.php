@@ -76,6 +76,9 @@
     <div class="topbar">
         <span>Hola, {{ Auth::user()->name }}</span>
         <a href="{{ url('/') }}">Ir a Inventario</a>
+        @can('admin')
+        <a href="{{ url('/usuarios') }}">Directorio / Personal</a>
+        @endcan
         <form method="POST" action="{{ route('logout') }}" style="display: inline; margin: 0;">
             @csrf
             <button type="submit" class="btn-logout">Cerrar sesión</button>

@@ -222,6 +222,9 @@
     <div class="topbar">
         @auth
             <span>Hola, {{ Auth::user()->name }}</span>
+            @can('admin')
+            <a href="{{ url('/usuarios') }}">Directorio / Personal</a>
+            @endcan
             <a href="{{ url('/trabajos') }}">Trabajos Asignados</a>
             <a href="{{ url('/dashboard') }}">Mi perfil</a>
             <a href="{{ url('/bitacora') }}">Bitácora</a>

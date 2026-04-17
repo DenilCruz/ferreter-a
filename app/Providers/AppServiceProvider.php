@@ -25,7 +25,7 @@ class AppServiceProvider extends ServiceProvider
         }
 
         \Illuminate\Support\Facades\Gate::define('admin', function ($user) {
-            return $user->email === 'admi@gmail.com';
+            return in_array($user->email, ['admi@gmail.com', 'denilson.c@ferre.bo']);
         });
     }
 }
