@@ -120,18 +120,22 @@ class UsuarioController extends Controller
             // 1. Matar Breeze Auth (deshabilitar login irrevocablemente)
             User::where('email', $correoBorrar)->delete();
 
-            // 2. Extirpar de tabla negocio (Cascará en DB a estadoRol, ventas si está en CASCADE, sino saltará excepción PDO sana)
+            // 2. Extirpar tablas dependientes para evitar Integrity constraint violations
+            DB::table('estadoRol')->where('ci_empleado', $ci)->delete();
+            DB::table('empleado')->where('ci', $ci)->delete();
+
+            // 3. Extirpar de tabla negocio central
             $usuario->delete();
 
-            // 3. Apuntar limpieza en libro de registro
-            Bitacora::registrar('ELIMINAR', 'usuario', $correoBorrar, 'Usuario y accesos eliminados');
+            // 4. Apuntar limpieza en libro de registro
+            Bitacora::registrar('ELIMINAR', 'usuario', $ci, 'Usuario y accesos eliminados');
 
             DB::commit();
 
             return redirect()->route('usuarios.index')->with('success_eliminar', 'Usuario y registro de acceso borrados permanentemente del sistema.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->withErrors(['form_eliminar' => 'Falló eliminación. Revisa que este usuario no esté atado a facturas existentes (Llaves foráneas). Error: ' . $e->getMessage()]);
+            return redirect()->route('usuarios.index')->with('error_general', 'Falló eliminación. Error de base de datos: ' . $e->getMessage());
         }
     }
 }

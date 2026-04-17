@@ -87,6 +87,11 @@
         <h1>Gestión de Personal y Usuarios</h1>
         <p class="subtitle">Directorio de recursos humanos, administradores y clientes.</p>
 
+        @if(session('success')) <div class="alert alert-success">{{ session('success') }}</div> @endif
+        @if(session('success_eliminar')) <div class="alert alert-success">{{ session('success_eliminar') }}</div> @endif
+        @if(session('error_general')) <div class="alert alert-error">{{ session('error_general') }}</div> @endif
+        @if($errors->any()) <div class="alert alert-error">{{ $errors->first() }}</div> @endif
+
         @can('admin')
         <div class="action-buttons">
             <button class="btn-action" id="btn-toggle-estudio" onclick="toggleForm('estudio')">Estudio Téc. (Ver Info)</button>
@@ -120,8 +125,6 @@
         <!-- FORMULARIO MODIFICAR -->
         <div class="form-container d-none" id="container-modificar">
             <h3>Modificar Perfil Operativo</h3>
-            @if(session('success')) <div class="alert alert-success">{{ session('success') }}</div> @endif
-            @if($errors->has('form_modificar')) <div class="alert alert-error">{{ $errors->first('form_modificar') }}</div> @endif
             
             <div class="form-grid" style="margin-bottom: 10px;">
                 <div class="field" style="grid-column: 1 / -1;">
@@ -147,7 +150,7 @@
                     <div class="field"><label>Correo Electrónico (Auth)</label><input type="email" id="modcorreo" name="correo" required></div>
                     <div class="field"><label>Domicilio</label><input type="text" id="moddomicilio" name="domicilio"></div>
                     <div class="field"><label>Tipo de Persona</label><input type="text" id="modtipo" name="tipoPersona" required></div>
-                    <button type="submit" class="btn-save" style="margin-top: 15px;">Aplicar Sync</button>
+                    <button type="submit" class="btn-save" style="margin-top: 15px;">Actualizar</button>
                 </div>
             </form>
         </div>
@@ -155,8 +158,6 @@
         <!-- FORMULARIO ELIMINAR -->
         <div class="form-container d-none" id="container-eliminar" style="border-color: #fca5a5; background-color: #fef2f2;">
             <h3 style="color: var(--danger);">Eliminar usuario irrevocablemente</h3>
-            @if(session('success_eliminar')) <div class="alert alert-success">{{ session('success_eliminar') }}</div> @endif
-            @if($errors->has('form_eliminar')) <div class="alert alert-error">{{ $errors->first('form_eliminar') }}</div> @endif
             <form id="form-eliminar" action="#" method="POST">
                 @csrf
                 @method('DELETE')
