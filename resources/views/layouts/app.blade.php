@@ -13,6 +13,46 @@
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
+        <style>
+            .tree-table {
+                width: 100%;
+                border-collapse: separate;
+                border-spacing: 0;
+                margin-top: 12px;
+                font-size: 0.9rem;
+                border-radius: 8px;
+                overflow: hidden;
+            }
+
+            .tree-table th {
+                background: #334155;
+                color: #fff;
+                padding: 12px 16px;
+                text-align: left;
+                font-weight: 600;
+                white-space: nowrap;
+            }
+
+            .tree-table td {
+                border-bottom: 1px solid #e2e8f0;
+                padding: 12px 16px;
+                background: #fafafa;
+                vertical-align: middle;
+            }
+
+            /* Precio alineado a la derecha */
+            .tree-table td:nth-child(3),
+            .tree-table th:nth-child(3) {
+                text-align: right;
+                white-space: nowrap;
+            }
+
+            /* Stock centrado */
+            .tree-table td:nth-child(4),
+            .tree-table th:nth-child(4) {
+                text-align: center;
+            }
+        </style>
     </head>
     <body class="font-sans antialiased text-slate-800">
         <div class="min-h-screen bg-gradient-to-br from-slate-200 via-slate-100 to-sky-100">

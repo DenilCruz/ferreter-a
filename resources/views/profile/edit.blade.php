@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-slate-800 leading-tight">
-            {{ __('Profile') }}
+            {{ __('Perfil') }}
         </h2>
     </x-slot>
 
@@ -26,4 +26,26 @@
             </div>
         </div>
     </div>
+    @if (session('status') === 'profile-updated')
+    <div
+        x-data="{ show: true }"
+        x-show="show"
+        x-transition
+        x-init="setTimeout(() => show = false, 3000)"
+        class="fixed bottom-5 right-5 z-50 bg-green-600 text-white px-5 py-3 rounded-lg shadow-xl"
+    >
+        Perfil actualizado correctamente
+    </div>
+    @endif
+    @if (session('status') === 'password-updated')
+    <div
+        x-data="{ show: true }"
+        x-show="show"
+        x-transition
+        x-init="setTimeout(() => show = false, 3000)"
+        class="fixed bottom-5 right-5 z-50 bg-green-600 text-white px-5 py-3 rounded-lg shadow-xl"
+    >
+        Contraseña actualizada correctamente
+    </div>
+    @endif
 </x-app-layout>

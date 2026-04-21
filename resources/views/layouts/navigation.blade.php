@@ -1,33 +1,47 @@
 <nav x-data="{ open: false }" class="relative z-50 bg-white/90 backdrop-blur-md border-b border-slate-200/80 shadow-sm">
-    <!-- Primary Navigation Menu -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
             <div class="flex">
-                <!-- Logo -->
+                <!-- LOGO + LINKS -->
                 <div class="shrink-0 flex items-center">
                     <a href="{{ url('/') }}">
                         <x-application-logo class="block h-9 w-auto fill-current text-teal-700" />
                     </a>
                 </div>
 
-                <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+                        {{ __('Dashboard') }}
+                    </x-nav-link>    
                     <x-nav-link :href="url('/')" :active="request()->is('/')">
                         {{ __('Inventario') }}
                     </x-nav-link>
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                        {{ __('Dashboard') }}
-                    </x-nav-link>
+
+                    @auth
+                        <x-nav-link :href="url('/trabajos')" :active="request()->is('trabajos*')">
+                            {{ __('Trabajos') }}
+                        </x-nav-link>
+
+                        <x-nav-link :href="url('/bitacora')" :active="request()->is('bitacora*')">
+                            {{ __('Bitácora') }}
+                        </x-nav-link>
+                    @endauth
+
+                    @can('admin')
+                        <x-nav-link :href="url('/usuarios')" :active="request()->is('usuarios*')">
+                            {{ __('Usuarios') }}
+                        </x-nav-link>
+                    @endcan
                 </div>
             </div>
 
             <!-- Settings Dropdown -->
+            @auth
             <div class="hidden sm:flex sm:items-center sm:ms-6">
                 <x-dropdown align="right" width="48" contentClasses="py-1 bg-white text-slate-700">
                     <x-slot name="trigger">
-                        <button class="inline-flex items-center px-3 py-2 border border-slate-200 text-sm leading-4 font-medium rounded-lg text-slate-600 bg-white hover:text-teal-800 hover:border-teal-200 focus:outline-none focus:ring-2 focus:ring-teal-500/30 transition ease-in-out duration-150">
+                        <button class="inline-flex items-center px-3 py-2 border border-slate-200 text-sm leading-4 font-medium rounded-lg text-slate-600 bg-white hover:text-teal-800 hover:border-teal-200 focus:outline-none focus:ring-2 focus:ring-teal-500/30 transition">
                             <div>{{ Auth::user()->name }}</div>
-
                             <div class="ms-1">
                                 <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
                                     <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
@@ -43,7 +57,7 @@
                         </div>
 
                         <x-dropdown-link :href="route('profile.edit')">
-                            {{ __('Profile') }}
+                            {{ __('Perfil') }}
                         </x-dropdown-link>
 
                         <!-- Authentication -->
@@ -51,14 +65,23 @@
                             @csrf
 
                             <x-dropdown-link :href="route('logout')"
-                                    onclick="event.preventDefault();
-                                                this.closest('form').submit();">
-                                {{ __('Log Out') }}
+                                    onclick="event.preventDefault(); this.closest('form').submit();">
+                                {{ __('Cerrar sesión') }}
                             </x-dropdown-link>
                         </form>
                     </x-slot>
                 </x-dropdown>
             </div>
+            @endauth
+
+            <!-- Iniciar sesión (solo si no está autenticado) -->
+            @guest
+            <div class="hidden sm:flex sm:items-center sm:ms-6">
+                <x-nav-link :href="route('login')" :active="request()->is('login')">
+                    {{ __('Iniciar sesión') }}
+                </x-nav-link>
+            </div>
+            @endguest
 
             <!-- Hamburger -->
             <div class="-me-2 flex items-center sm:hidden">
@@ -78,21 +101,37 @@
             <x-responsive-nav-link :href="url('/')" :active="request()->is('/')">
                 {{ __('Inventario') }}
             </x-responsive-nav-link>
+
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
+
+            @auth
+            <x-responsive-nav-link :href="url('/trabajos')" :active="request()->is('trabajos*')">
+                {{ __('Trabajos') }}
+            </x-responsive-nav-link>
+
+            <x-responsive-nav-link :href="url('/bitacora')" :active="request()->is('bitacora*')">
+                {{ __('Bitácora') }}
+            </x-responsive-nav-link>
+            @endauth
         </div>
 
-        <!-- Responsive Settings Options -->
+        @auth
         <div class="pt-4 pb-1 border-t border-slate-200">
+
             <div class="px-4">
-                <div class="font-medium text-base text-slate-800">{{ Auth::user()->name }}</div>
-                <div class="font-medium text-sm text-slate-500">{{ Auth::user()->email }}</div>
+                <div class="font-medium text-base text-slate-800">
+                    {{ Auth::user()->name }}
+                </div>
+                <div class="font-medium text-sm text-slate-500">
+                    {{ Auth::user()->email }}
+                </div>
             </div>
 
             <div class="mt-3 space-y-1">
                 <x-responsive-nav-link :href="route('profile.edit')">
-                    {{ __('Profile') }}
+                    {{ __('Perfil') }}
                 </x-responsive-nav-link>
 
                 <!-- Authentication -->
@@ -102,10 +141,19 @@
                     <x-responsive-nav-link :href="route('logout')"
                             onclick="event.preventDefault();
                                         this.closest('form').submit();">
-                        {{ __('Log Out') }}
+                        {{ __('Cerrar sesión') }}
                     </x-responsive-nav-link>
                 </form>
             </div>
         </div>
+        @endauth
+
+        @guest
+        <div class="pt-4 pb-1 border-t border-slate-200">
+            <x-responsive-nav-link :href="route('login')" :active="request()->is('login')">
+                {{ __('Iniciar sesión') }}
+            </x-responsive-nav-link>
+        </div>
+        @endguest
     </div>
 </nav>
