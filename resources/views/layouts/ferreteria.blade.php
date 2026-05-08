@@ -14,7 +14,7 @@
     {{-- ═══════════════════════════════════════════════════
          TOPBAR UNIFICADA — se muestra en todas las páginas
          ═══════════════════════════════════════════════════ --}}
-    <div class="topbar">
+    <div class="topbar" x-data="{ mobileMenuOpen: false }">
 
         {{-- Logo / Marca --}}
         <a href="{{ url('/') }}" class="topbar-brand">
@@ -22,7 +22,17 @@
             Ferretería Guisella
         </a>
 
-        <div class="topbar-links">
+        {{-- Botón Menú Móvil (Hamburguesa) --}}
+        <button class="hamburger-btn" @click="mobileMenuOpen = !mobileMenuOpen" aria-label="Menú">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+        </button>
+
+        {{-- Enlaces Escritorio --}}
+        <div class="topbar-links desktop-only">
             @auth
                 {{-- Inventario visible para todos --}}
                 <a href="{{ url('/') }}" class="{{ request()->is('/') ? 'active' : '' }}">Catálogo</a>
@@ -52,6 +62,39 @@
                 </form>
             @else
                 {{-- Visitante no autenticado --}}
+                <a href="{{ route('login') }}">Iniciar sesión</a>
+                <a href="{{ route('register') }}">Registrarse</a>
+            @endauth
+        </div>
+
+        {{-- Menú Móvil Desplegable --}}
+        <div class="mobile-menu" :class="{ 'is-open': mobileMenuOpen }" style="display: none;" x-show="mobileMenuOpen" x-transition.opacity>
+            @auth
+                <a href="{{ url('/') }}" class="{{ request()->is('/') ? 'active' : '' }}">Catálogo</a>
+
+                @unless(Auth::user()->tipoPersona === 'C')
+                    <a href="{{ route('trabajos.index') }}" class="{{ request()->routeIs('trabajos.index') ? 'active' : '' }}">Trabajos</a>
+                    
+                    @can('admin')
+                        <a href="{{ route('usuarios.index') }}" class="{{ request()->routeIs('usuarios.*') ? 'active' : '' }}">Personal</a>
+                        <a href="{{ route('bitacora.index') }}" class="{{ request()->routeIs('bitacora.*') ? 'active' : '' }}">Bitácora</a>
+                    @endcan
+                @endunless
+
+                <div class="mobile-menu-user">
+                    <span class="topbar-user" style="font-size: 1rem;">
+                        @can('admin')
+                            <span class="topbar-role-badge">Admin</span>
+                        @endcan
+                        {{ Auth::user()->name }}
+                    </span>
+                    <a href="{{ route('dashboard') }}" style="display: inline-block; padding: 6px 12px; margin: 0;">Mi perfil</a>
+                </div>
+                <form method="POST" action="{{ route('logout') }}" style="margin: 0;">
+                    @csrf
+                    <button type="submit" class="btn-logout">Salir</button>
+                </form>
+            @else
                 <a href="{{ route('login') }}">Iniciar sesión</a>
                 <a href="{{ route('register') }}">Registrarse</a>
             @endauth
