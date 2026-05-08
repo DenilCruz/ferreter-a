@@ -1,4 +1,9 @@
 <x-guest-layout>
+    <div class="auth-header">
+        <h2 class="auth-title">¡Bienvenido de nuevo!</h2>
+        <p class="auth-subtitle">Ingresa tus credenciales para acceder</p>
+    </div>
+
     <!-- Session Status -->
     <x-auth-session-status class="mb-4" :status="session('status')" />
 
@@ -6,42 +11,39 @@
         @csrf
 
         <!-- Email Address -->
-        <div>
-            <x-input-label for="email" :value="__('Correo')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
+        <div style="margin-bottom: 20px;">
+            <label for="email">Correo Electrónico</label>
+            <input id="email" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" placeholder="ejemplo@correo.com">
+            <x-input-error :messages="$errors->get('email')" style="color: #ef4444; font-size: 0.8rem; margin-top: 5px;" />
         </div>
 
         <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Contraseña')" />
-
-            <x-text-input id="password" class="block mt-1 w-full"
-                            type="password"
-                            name="password"
-                            required autocomplete="current-password" />
-
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
+        <div style="margin-bottom: 20px;">
+            <label for="password">Contraseña</label>
+            <input id="password" type="password" name="password" required autocomplete="current-password" placeholder="••••••••">
+            <x-input-error :messages="$errors->get('password')" style="color: #ef4444; font-size: 0.8rem; margin-top: 5px;" />
         </div>
 
         <!-- Remember Me -->
-        <div class="block mt-4">
-            <label for="remember_me" class="inline-flex items-center">
-                <input id="remember_me" type="checkbox" class="rounded border-slate-300 text-teal-600 shadow-sm focus:ring-teal-500" name="remember">
-                <span class="ms-2 text-sm text-slate-600">{{ __('Recordarme') }}</span>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+            <label style="display: flex; align-items: center; cursor: pointer; text-transform: none; margin-left: 0;">
+                <input id="remember_me" type="checkbox" name="remember" style="width: 18px; height: 18px; margin-right: 10px;">
+                <span style="font-size: 0.85rem; color: #64748b;">Recordarme</span>
             </label>
-        </div>
-
-        <div class="flex items-center justify-end mt-4">
             @if (Route::has('password.request'))
-                <a class="underline text-sm text-slate-600 hover:text-teal-800 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500" href="{{ route('password.request') }}">
-                    {{ __('¿Olvidaste tu contraseña?') }}
+                <a style="font-size: 0.85rem; color: var(--primary); text-decoration: none; font-weight: 600;" href="{{ route('password.request') }}">
+                    ¿Olvidaste tu clave?
                 </a>
             @endif
+        </div>
 
-            <x-primary-button class="ms-3">
-                {{ __('Iniciar sesión') }}
-            </x-primary-button>
+        <button type="submit" class="btn-auth">
+            Iniciar Sesión
+        </button>
+
+        <div style="text-align: center; margin-top: 25px; font-size: 0.9rem; color: #64748b;">
+            ¿No tienes cuenta? 
+            <a href="{{ route('register') }}" style="color: var(--primary); font-weight: 700; text-decoration: none;">Regístrate ahora</a>
         </div>
     </form>
 </x-guest-layout>

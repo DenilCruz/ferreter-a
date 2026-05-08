@@ -3,39 +3,61 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\UsuarioController;
+use App\Http\Controllers\TrabajoController;
 use Illuminate\Support\Facades\Route;
 
-// 1. Ruta principal: Muestra el inventario al entrar a 127.0.0.1:8000
-Route::get('/', [ProductoController::class, 'index']);
+// ─────────────────────────────────────────────────────────
+// PÚBLICAS — accesibles sin login
+// ─────────────────────────────────────────────────────────
+Route::get('/', [ProductoController::class, 'index'])->name('inventario');
 
-// 2. Ruta del Dashboard de Breeze (Protegida por login)
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+// ─────────────────────────────────────────────────────────
+// AUTENTICADAS — requieren login
+// ─────────────────────────────────────────────────────────
+Route::middleware(['auth', 'verified'])->group(function () {
 
-// 3. Rutas de perfil de Breeze (Protegidas por login)
-Route::middleware('auth')->group(function () {
+    // Dashboard personal (Breeze)
+    Route::get('/dashboard', function () {
+        // Estadísticas para el Administrador
+        $totalProductos = \App\Models\Producto::count();
+        $totalUsuarios = \App\Models\Usuario::count();
+        $stockBajo = \App\Models\Producto::where('cantidad', '<', 5)->count();
+        $ultimasBitacoras = \App\Models\Bitacora::orderBy('created_at', 'desc')->take(5)->get();
+
+        return view('dashboard.index', compact('totalProductos', 'totalUsuarios', 'stockBajo', 'ultimasBitacoras'));
+    })->name('dashboard');
+
+    // Perfil de usuario (Breeze)
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-});
 
-Route::get('/bitacora', function() {
-    $registros = \App\Models\Bitacora::orderBy('created_at', 'desc')->get();
-    return view('bitacora', compact('registros'));
+    // Inventario: CRUD de productos (cualquier empleado autenticado)
+    Route::get('/api/producto/{id}', [ProductoController::class, 'getProducto']);
+    Route::resource('productos', ProductoController::class);
+
+    // Trabajos y asignaciones (cualquier empleado autenticado, la vista filtra por rol)
+    Route::get('/trabajos', [TrabajoController::class, 'index'])->name('trabajos.index');
+
+    // ─────────────────────────────────────────────────────
+    // SOLO ADMIN — requieren login + ser administrador
+    // ─────────────────────────────────────────────────────
+    Route::middleware('admin')->group(function () {
+
+        // Gestión de usuarios / personal
+        Route::get('/api/usuario/{ci}', [UsuarioController::class, 'getUsuario']);
+        Route::resource('usuarios', UsuarioController::class);
+
+        // Crear roles y asignar trabajos
+        Route::post('/trabajos/rol', [TrabajoController::class, 'store'])->name('trabajos.store');
+        Route::post('/trabajos/asignar', [TrabajoController::class, 'asignar'])->name('trabajos.asignar');
+
+        // Bitácora de auditoría
+        Route::get('/bitacora', function () {
+            $registros = \App\Models\Bitacora::orderBy('created_at', 'desc')->get();
+            return view('bitacora.index', compact('registros'));
+        })->name('bitacora.index');
+    });
 });
 
 require __DIR__.'/auth.php';
-
-// 4. Rutas para tus Casos de Uso (CRUD completo)
-Route::get('/api/producto/{id}', [ProductoController::class, 'getProducto']);
-Route::get('/api/usuario/{ci}', [\App\Http\Controllers\UsuarioController::class, 'getUsuario']);
-Route::resource('productos', ProductoController::class);
-Route::resource('usuarios', UsuarioController::class);
-
-// 5. Rutas de Trabajos y Asignaciones
-Route::middleware('auth')->group(function () {
-    Route::get('/trabajos', [\App\Http\Controllers\TrabajoController::class, 'index'])->name('trabajos.index');
-    Route::post('/trabajos/rol', [\App\Http\Controllers\TrabajoController::class, 'store'])->name('trabajos.store');
-    Route::post('/trabajos/asignar', [\App\Http\Controllers\TrabajoController::class, 'asignar'])->name('trabajos.asignar');
-});
