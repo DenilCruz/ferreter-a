@@ -23,8 +23,8 @@ class TrabajoController extends Controller
         if ($isAdmin) {
             // El admin ve TODOS los roles y puede asignar
             // Extraer empleados con sus datos de usuario
-            // Obtenemos a TODOS los usuarios registrados como Personal (tipoPersona = 'E')
-            $empleados = Usuario::where('tipoPersona', 'E')->get();
+            // Obtenemos a TODOS los usuarios para permitir asignar roles a cualquier persona (incluso clientes)
+            $empleados = Usuario::all();
             $rolesDisponibles = Rol::all();
             
             // Ver asignaciones de todos
@@ -77,12 +77,23 @@ class TrabajoController extends Controller
             'ci_empleado' => 'required|string|exists:usuario,ci'
         ]);
 
-        // 0. Asegurarse de que el usuario existe en la tabla 'empleado' 
-        // (Por si fue registrado como Personal pero nunca se le asignó un rol)
-        Empleado::firstOrCreate(
+        // 0. Asegurarse de que el usuario sea de tipo 'E' y su estado en empleado sea 'Activo'
+        $usuario = Usuario::find($request->ci_empleado);
+        if ($usuario && $usuario->tipoPersona !== 'E') {
+            $usuario->tipoPersona = 'E';
+            $usuario->save();
+        }
+
+        $empleado = Empleado::firstOrCreate(
             ['ci' => $request->ci_empleado],
             ['salario' => 0.00, 'estado' => 'Activo']
         );
+
+        // Si el empleado existía pero estaba Inactivo (por una baja anterior), lo reactivamos
+        if ($empleado->estado !== 'Activo') {
+            $empleado->estado = 'Activo';
+            $empleado->save();
+        }
 
         // 1. Intentar actualizar si ya tiene el rol (aunque esté inactivo)
         $updated = EstadoRol::where('id_rol', $request->id_rol)
