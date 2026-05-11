@@ -4,12 +4,37 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\TrabajoController;
+<<<<<<< Updated upstream
+=======
+use App\Http\Controllers\CartController;
+use App\Http\Controllers\MarcaController;
+use App\Http\Controllers\CategoriaController;
+>>>>>>> Stashed changes
 use Illuminate\Support\Facades\Route;
 
 // ─────────────────────────────────────────────────────────
 // PÚBLICAS — accesibles sin login
 // ─────────────────────────────────────────────────────────
 Route::get('/', [ProductoController::class, 'index'])->name('inventario');
+<<<<<<< Updated upstream
+=======
+Route::get('/catalogo/producto/{id}', [ProductoController::class, 'showPublic'])->name('producto.show');
+
+// Marcas públicas
+Route::get('/marcas', [MarcaController::class, 'indexPublic'])->name('marcas.index');
+Route::get('/marcas/{id}/productos', [MarcaController::class, 'productosPorMarca'])->name('marcas.productos');
+
+// Categorías públicas
+Route::get('/categorias', [CategoriaController::class, 'indexPublic'])->name('categorias.index');
+Route::get('/categorias/{id}/productos', [CategoriaController::class, 'productosPorCategoria'])->name('categorias.productos');
+
+// Rutas de Carrito (Públicas y para Auth)
+Route::get('/carrito', [CartController::class, 'index'])->name('carrito.index');
+Route::post('/carrito/add', [CartController::class, 'add'])->name('carrito.add');
+Route::post('/carrito/update', [CartController::class, 'update'])->name('carrito.update');
+Route::post('/carrito/remove', [CartController::class, 'remove'])->name('carrito.remove');
+Route::post('/carrito/clear', [CartController::class, 'clear'])->name('carrito.clear');
+>>>>>>> Stashed changes
 
 // ─────────────────────────────────────────────────────────
 // AUTENTICADAS — requieren login
@@ -51,6 +76,22 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // SOLO ADMIN — requieren login + ser administrador
     // ─────────────────────────────────────────────────────
     Route::middleware('admin')->group(function () {
+
+        // Admin: Marcas
+        Route::get('/admin/marcas', [MarcaController::class, 'index'])->name('admin.marcas.index');
+        Route::get('/admin/marcas/crear', [MarcaController::class, 'create'])->name('admin.marcas.create');
+        Route::post('/admin/marcas', [MarcaController::class, 'store'])->name('admin.marcas.store');
+        Route::get('/admin/marcas/{id}/editar', [MarcaController::class, 'edit'])->name('admin.marcas.edit');
+        Route::put('/admin/marcas/{id}', [MarcaController::class, 'update'])->name('admin.marcas.update');
+        Route::delete('/admin/marcas/{id}', [MarcaController::class, 'destroy'])->name('admin.marcas.destroy');
+
+        // Admin: Categorías (Admin + Almacenero, la autorización se hace en el controlador)
+        Route::get('/admin/categorias', [CategoriaController::class, 'index'])->name('admin.categorias.index');
+        Route::get('/admin/categorias/crear', [CategoriaController::class, 'create'])->name('admin.categorias.create');
+        Route::post('/admin/categorias', [CategoriaController::class, 'store'])->name('admin.categorias.store');
+        Route::get('/admin/categorias/{id}/editar', [CategoriaController::class, 'edit'])->name('admin.categorias.edit');
+        Route::put('/admin/categorias/{id}', [CategoriaController::class, 'update'])->name('admin.categorias.update');
+        Route::delete('/admin/categorias/{id}', [CategoriaController::class, 'destroy'])->name('admin.categorias.destroy');
 
         // Gestión de usuarios / personal
         Route::get('/api/usuario/{ci}', [UsuarioController::class, 'getUsuario']);

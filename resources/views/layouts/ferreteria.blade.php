@@ -36,12 +36,16 @@
             @auth
                 {{-- Inventario visible para todos --}}
                 <a href="{{ url('/') }}" class="{{ request()->is('/') ? 'active' : '' }}">Catálogo</a>
+                <a href="{{ route('marcas.index') }}" class="{{ request()->routeIs('marcas.*') ? 'active' : '' }}">Marcas</a>
+                <a href="{{ route('categorias.index') }}" class="{{ request()->routeIs('categorias.*') ? 'active' : '' }}">Categorías</a>
 
                 {{-- Solo personal operativo (Admin y Almaceneros) ven Trabajos --}}
                 @unless(Auth::user()->tipoPersona === 'C')
                     <a href="{{ route('trabajos.index') }}" class="{{ request()->routeIs('trabajos.index') ? 'active' : '' }}">Trabajos</a>
-                    
+
                     @can('admin')
+                        <a href="{{ route('admin.marcas.index') }}" class="{{ request()->routeIs('admin.marcas.*') ? 'active' : '' }}">Marcas Admin</a>
+                        <a href="{{ route('admin.categorias.index') }}" class="{{ request()->routeIs('admin.categorias.*') ? 'active' : '' }}">Categorías Admin</a>
                         <a href="{{ route('usuarios.index') }}" class="{{ request()->routeIs('usuarios.*') ? 'active' : '' }}">Personal</a>
                         <a href="{{ route('bitacora.index') }}" class="{{ request()->routeIs('bitacora.*') ? 'active' : '' }}">Bitácora</a>
                     @endcan
@@ -62,6 +66,12 @@
                 </form>
             @else
                 {{-- Visitante no autenticado --}}
+<<<<<<< Updated upstream
+=======
+                <a href="{{ url('/') }}" class="{{ request()->is('/') ? 'active' : '' }}">Catálogo</a>
+                <a href="{{ route('marcas.index') }}" class="{{ request()->routeIs('marcas.*') ? 'active' : '' }}">Marcas</a>
+                <a href="{{ route('categorias.index') }}" class="{{ request()->routeIs('categorias.*') ? 'active' : '' }}">Categorías</a>
+>>>>>>> Stashed changes
                 <a href="{{ route('login') }}">Iniciar sesión</a>
                 <a href="{{ route('register') }}">Registrarse</a>
             @endauth
@@ -71,11 +81,15 @@
         <div class="mobile-menu" :class="{ 'is-open': mobileMenuOpen }" style="display: none;" x-show="mobileMenuOpen" x-transition.opacity>
             @auth
                 <a href="{{ url('/') }}" class="{{ request()->is('/') ? 'active' : '' }}">Catálogo</a>
+                <a href="{{ route('marcas.index') }}" class="{{ request()->routeIs('marcas.*') ? 'active' : '' }}">Marcas</a>
+                <a href="{{ route('categorias.index') }}" class="{{ request()->routeIs('categorias.*') ? 'active' : '' }}">Categorías</a>
 
                 @unless(Auth::user()->tipoPersona === 'C')
                     <a href="{{ route('trabajos.index') }}" class="{{ request()->routeIs('trabajos.index') ? 'active' : '' }}">Trabajos</a>
-                    
+
                     @can('admin')
+                        <a href="{{ route('admin.marcas.index') }}" class="{{ request()->routeIs('admin.marcas.*') ? 'active' : '' }}">Marcas Admin</a>
+                        <a href="{{ route('admin.categorias.index') }}" class="{{ request()->routeIs('admin.categorias.*') ? 'active' : '' }}">Categorías Admin</a>
                         <a href="{{ route('usuarios.index') }}" class="{{ request()->routeIs('usuarios.*') ? 'active' : '' }}">Personal</a>
                         <a href="{{ route('bitacora.index') }}" class="{{ request()->routeIs('bitacora.*') ? 'active' : '' }}">Bitácora</a>
                     @endcan
@@ -95,6 +109,12 @@
                     <button type="submit" class="btn-logout">Salir</button>
                 </form>
             @else
+<<<<<<< Updated upstream
+=======
+                <a href="{{ url('/') }}" class="{{ request()->is('/') ? 'active' : '' }}">Catálogo</a>
+                <a href="{{ route('marcas.index') }}" class="{{ request()->routeIs('marcas.*') ? 'active' : '' }}">Marcas</a>
+                <a href="{{ route('categorias.index') }}" class="{{ request()->routeIs('categorias.*') ? 'active' : '' }}">Categorías</a>
+>>>>>>> Stashed changes
                 <a href="{{ route('login') }}">Iniciar sesión</a>
                 <a href="{{ route('register') }}">Registrarse</a>
             @endauth

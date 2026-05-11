@@ -32,7 +32,7 @@
             </label>
             @if (Route::has('password.request'))
                 <a style="font-size: 0.85rem; color: var(--primary); text-decoration: none; font-weight: 600;" href="{{ route('password.request') }}">
-                    ¿Olvidaste tu clave?
+                    ¿Olvidaste tu contraseña?
                 </a>
             @endif
         </div>

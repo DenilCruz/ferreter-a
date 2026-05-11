@@ -3,9 +3,87 @@
 @section('title', 'Panel de Control - Ferretería Guisella')
 
 @section('content')
+<style>
+/* ── Dashboard responsive ── */
+.admin-right-col {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    min-width: 0;
+    width: 100%;
+}
+
+.quick-actions-card {
+    background: var(--primary-gradient) !important;
+    color: white;
+    border: none !important;
+    box-shadow: 0 8px 24px rgba(13,148,136,0.3) !important;
+    width: 100%;
+    box-sizing: border-box;
+}
+.quick-actions-card h3 { color: white; margin-bottom: 16px; }
+
+.quick-action-btn {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 14px 16px;
+    border-radius: var(--radius-sm);
+    text-align: center;
+    font-weight: 700;
+    font-size: 0.95rem;
+    text-decoration: none;
+    transition: background 0.2s;
+    white-space: normal;
+    word-break: break-word;
+}
+.quick-action-btn.primary  { background: rgba(255,255,255,0.22); color: white; }
+.quick-action-btn.secondary{ background: rgba(255,255,255,0.10); color: white; font-weight: 600; margin-top: 10px; }
+.quick-action-btn:hover { background: rgba(255,255,255,0.35) !important; color: white !important; }
+
+.support-card {
+    background: var(--bg-light) !important;
+    border: 1px dashed var(--border) !important;
+    width: 100%;
+    box-sizing: border-box;
+}
+.support-card p { line-height: 1.6; font-size: 0.9rem; }
+
+.bitacora-time { white-space: nowrap; }
+
+/* Forzar contenedor bitácora a respetar ancho */
+.bitacora-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
+    max-width: 100%;
+    display: block;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+}
+.bitacora-wrap table {
+    min-width: 520px;
+    width: 100%;
+    border-collapse: collapse;
+}
+
+@media (max-width: 768px) {
+    .dashboard-welcome h1   { font-size: 1.4rem; }
+    .dashboard-welcome .subtitle { font-size: 0.95rem; }
+    .stat-grid { grid-template-columns: 1fr !important; }
+    .admin-right-col { gap: 16px; }
+    .quick-actions-card,
+    .support-card { padding: 20px !important; }
+}
+@media (max-width: 480px) {
+    .dashboard-welcome h1 { font-size: 1.2rem; }
+    .quick-action-btn { padding: 12px; font-size: 0.9rem; }
+}
+</style>
 <div class="animate-fade-up">
     <div class="page-header">
-        <div>
+        <div class="dashboard-welcome">
             <h1>Bienvenido, {{ Auth::user()->nombre }}</h1>
             <p class="subtitle" style="margin: 0;">
                 @if($isAdmin)
@@ -65,8 +143,8 @@
                     <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20v-6M9 20v-10M15 20v-4M3 20h18"/></svg>
                     Actividad Reciente en Bitácora
                 </h3>
-                <div class="table-wrap">
-                    <table>
+                <div class="bitacora-wrap">
+                    <table class="bitacora-table">
                         <thead>
                             <tr>
                                 <th>Acción</th>
@@ -89,30 +167,32 @@
                                     @endif
                                 </td>
                                 <td>{{ $log->descripcion }}</td>
-                                <td class="muted">{{ $log->created_at->diffForHumans() }}</td>
+                                <td class="muted bitacora-time">{{ $log->created_at->diffForHumans() }}</td>
                             </tr>
                             @endforeach
                         </tbody>
                     </table>
                 </div>
-                <div class="text-right" style="margin-top: 20px;">
+                <div class="text-right" style="margin-top: 16px;">
                     <a href="{{ route('bitacora.index') }}">Ver bitácora completa →</a>
                 </div>
             </div>
 
-            {{-- Accesos Rápidos --}}
-            <div style="display: flex; flex-direction: column; gap: 30px;">
-                <div class="card" style="background: var(--primary-gradient); color: white; border: none;">
-                    <h3 style="color: white; margin-bottom: 20px;">Acciones Rápidas</h3>
-                    <div style="display: flex; flex-direction: column; gap: 12px;">
-                        <a href="{{ route('productos.create') }}" style="background: rgba(255,255,255,0.2); color: white; padding: 14px; border-radius: var(--radius-sm); text-align: center; font-weight: 700; transition: background 0.2s;">+ Nuevo Producto</a>
-                        <a href="{{ route('usuarios.index') }}" style="background: rgba(255,255,255,0.1); color: white; padding: 14px; border-radius: var(--radius-sm); text-align: center; font-weight: 600; transition: background 0.2s;">Gestionar Personal</a>
+            {{-- Accesos Rápidos + Soporte --}}
+            <div class="admin-right-col">
+                <div class="card quick-actions-card">
+                    <h3>Acciones Rápidas</h3>
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <a href="{{ route('productos.create') }}" class="quick-action-btn primary">+ Nuevo Producto</a>
+                        <a href="{{ route('usuarios.index') }}" class="quick-action-btn secondary">Gestionar Personal</a>
                     </div>
                 </div>
 
-                <div class="card" style="background: var(--bg-light); border: 1px dashed var(--border);">
+                <div class="card support-card">
                     <h4>Soporte del Sistema</h4>
-                    <p class="muted" style="font-size: 0.9rem; margin-top: 10px;">Si tienes problemas con la sincronización de stock, contacta al soporte técnico o verifica tu conexión.</p>
+                    <p class="muted" style="font-size: 0.9rem; margin-top: 10px; line-height: 1.6;">
+                        Si tienes problemas con la sincronización de stock, contacta al soporte técnico o verifica tu conexión.
+                    </p>
                 </div>
             </div>
 
@@ -126,7 +206,8 @@
         <div class="card" style="max-width: 640px;">
             <h3 style="margin-bottom: 24px;">Mis datos de cuenta</h3>
 
-            <table style="width: 100%; border-collapse: collapse;">
+            <div style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
+            <table style="width: 100%; border-collapse: collapse; min-width: 260px;">
                 <tbody>
                     <tr style="border-bottom: 1px solid var(--border);">
                         <td style="padding: 12px 8px; color: var(--text-muted); font-weight: 600; width: 40%;">C.I.</td>
@@ -163,6 +244,7 @@
                     </tr>
                 </tbody>
             </table>
+            </div>
 
             <div style="margin-top: 24px;">
                 <a href="{{ route('profile.edit') }}" class="btn-save" style="text-decoration: none; display: inline-block;">Editar mi perfil</a>
