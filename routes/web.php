@@ -18,13 +18,21 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Dashboard personal (Breeze)
     Route::get('/dashboard', function () {
-        // Estadísticas para el Administrador
-        $totalProductos = \App\Models\Producto::count();
-        $totalUsuarios = \App\Models\Usuario::count();
-        $stockBajo = \App\Models\Producto::where('cantidad', '<', 5)->count();
-        $ultimasBitacoras = \App\Models\Bitacora::orderBy('created_at', 'desc')->take(5)->get();
+        $isAdmin = \Illuminate\Support\Facades\Gate::allows('admin');
 
-        return view('dashboard.index', compact('totalProductos', 'totalUsuarios', 'stockBajo', 'ultimasBitacoras'));
+        $totalProductos = null;
+        $totalUsuarios  = null;
+        $stockBajo      = null;
+        $ultimasBitacoras = collect();
+
+        if ($isAdmin) {
+            $totalProductos   = \App\Models\Producto::count();
+            $totalUsuarios    = \App\Models\Usuario::count();
+            $stockBajo        = \App\Models\Producto::where('cantidad', '<', 5)->count();
+            $ultimasBitacoras = \App\Models\Bitacora::orderBy('created_at', 'desc')->take(5)->get();
+        }
+
+        return view('dashboard.index', compact('isAdmin', 'totalProductos', 'totalUsuarios', 'stockBajo', 'ultimasBitacoras'));
     })->name('dashboard');
 
     // Perfil de usuario (Breeze)
@@ -51,6 +59,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Crear roles y asignar trabajos
         Route::post('/trabajos/rol', [TrabajoController::class, 'store'])->name('trabajos.store');
         Route::post('/trabajos/asignar', [TrabajoController::class, 'asignar'])->name('trabajos.asignar');
+        Route::post('/trabajos/baja', [TrabajoController::class, 'darDeBaja'])->name('trabajos.baja');
 
         // Bitácora de auditoría
         Route::get('/bitacora', function () {
