@@ -26,10 +26,12 @@
     <div class="product-carousel" id="carousel-{{ $categoria->idcategoria }}">
         @foreach($categoria->productos as $prod)
             <div class="product-card">
-                {{-- Imagen Placeholder con Icono --}}
-                <div class="product-image-placeholder">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
-                </div>
+                <a href="{{ route('producto.show', $prod->idproducto) }}" style="text-decoration: none; display: block; color: inherit;">
+                    {{-- Imagen Placeholder con Icono --}}
+                    <div class="product-image-placeholder">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+                    </div>
+                </a>
 
                 @can('admin')
                     <div class="product-actions">
@@ -40,7 +42,11 @@
                 @endcan
 
                 <div class="product-info">
-                    <h3 class="product-name">{{ $prod->nombre }}</h3>
+                    <h3 class="product-name">
+                        <a href="{{ route('producto.show', $prod->idproducto) }}" style="text-decoration: none; color: inherit; transition: color 0.2s ease;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='inherit'">
+                            {{ $prod->nombre }}
+                        </a>
+                    </h3>
                     <p class="product-desc">{{ $prod->descripcion ?? 'Sin descripción.' }}</p>
                 </div>
 
@@ -53,6 +59,21 @@
                         {{ $prod->cantidad }} unid.
                     </div>
                 </div>
+
+                @if($prod->cantidad > 0)
+                    <form action="{{ route('carrito.add') }}" method="POST" style="margin-top: 15px;" class="ajax-cart-form">
+                        @csrf
+                        <input type="hidden" name="idproducto" value="{{ $prod->idproducto }}">
+                        <input type="hidden" name="cantidad" value="1">
+                        <button type="submit" class="btn-action" style="width: 100%; padding: 8px; font-size: 0.9rem;">
+                            Añadir al carrito
+                        </button>
+                    </form>
+                @else
+                    <div style="margin-top: 15px; text-align: center; color: var(--danger); font-weight: 600; font-size: 0.9rem; padding: 8px;">
+                        Agotado
+                    </div>
+                @endif
             </div>
         @endforeach
 

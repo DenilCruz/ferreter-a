@@ -134,6 +134,16 @@ class ProductoController extends Controller
         return response()->json(['success' => false, 'message' => 'Producto no encontrado'], 404);
     }
 
+    public function showPublic($id)
+    {
+        // ElOrFail valida que exista y lanza 404 si no.
+        $producto = \App\Models\Producto::with(['categoria', 'marca', 'color', 'medida', 'volumen'])
+                        ->where('idproducto', $id)
+                        ->firstOrFail();
+
+        return view('inventario.producto-detalle', compact('producto'));
+    }
+
     public function destroy(string $id)
     {
         try {

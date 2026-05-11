@@ -15,6 +15,10 @@
     </div>
 
     <div style="margin-top: 40px; padding: 30px; background: white; border-radius: 20px; text-align: center; border: 1px dashed #cbd5e1;">
-        <p style="color: var(--muted);">¿Necesitas realizar un pedido o cotización? <a href="{{ route('login') }}" style="color: var(--accent); font-weight: bold;">Inicia sesión</a> para más opciones.</p>
+        @guest
+            <p style="color: var(--muted);">¿Necesitas finalizar un pedido o cotización? <a href="{{ route('login') }}" style="color: var(--primary); font-weight: bold;">Inicia sesión</a> para proceder al pago.</p>
+        @else
+            <p style="color: var(--muted);">¿Listo para pedir? <a href="{{ route('carrito.index') }}" style="color: var(--primary); font-weight: bold;">Revisa tu carrito</a> y procede al pago.</p>
+        @endguest
     </div>
 @endsection

@@ -4,17 +4,29 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\TrabajoController;
+use App\Http\Controllers\CartController;
 use Illuminate\Support\Facades\Route;
 
 // ─────────────────────────────────────────────────────────
 // PÚBLICAS — accesibles sin login
 // ─────────────────────────────────────────────────────────
 Route::get('/', [ProductoController::class, 'index'])->name('inventario');
+Route::get('/catalogo/producto/{id}', [ProductoController::class, 'showPublic'])->name('producto.show');
+
+// Rutas de Carrito (Públicas y para Auth)
+Route::get('/carrito', [CartController::class, 'index'])->name('carrito.index');
+Route::post('/carrito/add', [CartController::class, 'add'])->name('carrito.add');
+Route::post('/carrito/update', [CartController::class, 'update'])->name('carrito.update');
+Route::post('/carrito/remove', [CartController::class, 'remove'])->name('carrito.remove');
+Route::post('/carrito/clear', [CartController::class, 'clear'])->name('carrito.clear');
 
 // ─────────────────────────────────────────────────────────
 // AUTENTICADAS — requieren login
 // ─────────────────────────────────────────────────────────
 Route::middleware(['auth', 'verified'])->group(function () {
+
+    // Carrito Checkout
+    Route::post('/carrito/checkout', [CartController::class, 'checkout'])->name('carrito.checkout');
 
     // Dashboard personal (Breeze)
     Route::get('/dashboard', function () {
