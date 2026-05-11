@@ -13,7 +13,7 @@ class EstadoRol extends Model
     protected $primaryKey = null;
     public $incrementing = false;
 
-    protected $fillable = ['id_rol', 'ci_empleado', 'fechaInicio', 'fechaFinal', 'estado'];
+    protected $fillable = ['id_rol', 'ci_empleado', 'fechaInicio', 'fechaFin', 'estado'];
 
     public function rol()
     {

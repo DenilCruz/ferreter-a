@@ -1,327 +1,165 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Gestión de Usuarios - Ferretería Guisella</title>
-    <style>
-        :root {
-            --bg: #e8eef3;
-            --surface: #ffffff;
-            --text: #1e293b;
-            --muted: #64748b;
-            --accent: #0f766e;
-            --accent-hover: #0d9488;
-            --danger: #dc2626;
-            --radius: 12px;
-            --shadow: 0 1px 2px rgba(15, 23, 42, 0.06), 0 8px 24px rgba(15, 23, 42, 0.08);
-        }
-        * { box-sizing: border-box; }
-        body {
-            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-            margin: 0; padding: 24px; padding-top: 88px;
-            background: linear-gradient(160deg, var(--bg) 0%, #dbeafe 100%);
-            color: var(--text); min-height: 100vh;
-        }
-        .topbar {
-            position: fixed; top: 0; left: 0; right: 0; z-index: 10;
-            display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 12px;
-            padding: 14px 24px; background: rgba(255, 255, 255, 0.92); backdrop-filter: blur(8px);
-            border-bottom: 1px solid rgba(15, 23, 42, 0.08); box-shadow: var(--shadow);
-        }
-        .topbar a { text-decoration: none; color: var(--accent); font-weight: 600; font-size: 0.9rem; }
-        .topbar span { color: var(--muted); font-weight: 600; font-size: 0.9rem; }
-        .btn-logout { background: var(--danger); color: #fff; border: none; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.9rem; }
-        .wrap { max-width: 1100px; margin: 0 auto; }
-        h1 { font-size: 1.75rem; font-weight: 700; margin: 0 0 8px; }
-        .subtitle { color: var(--muted); margin: 0 0 28px; }
-        
-        .action-buttons { display: flex; gap: 12px; margin-bottom: 24px; }
-        .btn-action {
-            background: var(--surface); color: var(--accent); border: 2px solid var(--accent);
-            padding: 12px 24px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 1rem; transition: all 0.2s;
-        }
-        .btn-action:hover, .btn-action.active { background: var(--accent); color: #fff; }
-        
-        .form-container { background: var(--surface); padding: 24px; border-radius: var(--radius); margin-bottom: 28px; box-shadow: var(--shadow); border: 1px solid rgba(15, 23, 42, 0.06); }
-        .form-container h3 { margin: 0 0 18px; font-size: 1.1rem; }
-        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; align-items: start; }
-        .field { display: flex; flex-direction: column; gap: 6px; }
-        .form-grid input, .form-grid select { padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.9rem; width: 100%; }
-        .btn-save { background: linear-gradient(180deg, var(--accent-hover), var(--accent)); color: #fff; border: none; padding: 10px 18px; border-radius: 8px; cursor: pointer; font-weight: 600; align-self: end; }
-        
-        .catalog { background: var(--surface); padding: 24px; border-radius: var(--radius); box-shadow: var(--shadow); border: 1px solid rgba(15, 23, 42, 0.06); }
-        .catalog h2 { margin: 0 0 8px; font-size: 1.25rem; }
-        .table-wrap { overflow-x: auto; margin-top: 12px; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
-        th { background: #334155; color: #fff; padding: 12px; text-align: left; }
-        td { border-bottom: 1px solid #e2e8f0; padding: 12px; }
-        tr:hover td { background: #f8fafc; }
-        
-        .badge { background: #e2e8f0; color: #475569; padding: 4px 8px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; }
-        
-        .d-none { display: none !important; }
-        .error-text { color: #b91c1c; font-size: 0.8rem; margin: 0; }
-        .alert { border-radius: 10px; padding: 12px 14px; margin-bottom: 14px; font-size: 0.9rem; }
-        .alert-success { background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; }
-        .alert-error { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
+@extends('layouts.ferreteria')
 
-        /* Estilos de tabla del Estudio (Mini Modal/Box) */
-        .study-box { background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px dashed #cbd5e1; margin-top: 15px; }
-        .task-list { list-style: none; padding: 0; margin: 0; }
-        .task-list li { background: white; padding: 10px; border-radius: 6px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); margin-bottom: 8px; border-left: 3px solid var(--accent); }
-    </style>
-</head>
-<body>
-    <div class="topbar">
-        <span>Hola, {{ Auth::user()->name }}</span>
-        <a href="{{ url('/') }}">Ir a Inventario</a>
-        <a href="{{ url('/trabajos') }}">Trabajos Asignados</a>
-        <form method="POST" action="{{ route('logout') }}" style="display: inline; margin: 0;">
+@section('title', 'Gestión de Usuarios - Ferretería Guisella')
+
+@section('content')
+<div class="animate-fade-up">
+    <div class="page-header">
+        <div>
+            <h1 style="margin: 0;">Gestión de Personal y Usuarios</h1>
+            <p class="subtitle" style="margin: 0;">Directorio de recursos humanos, administradores y clientes.</p>
+        </div>
+    </div>
+
+    @if(session('success')) <div class="alert alert-success"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> {{ session('success') }}</div> @endif
+    @if(session('success_eliminar')) <div class="alert alert-success"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> {{ session('success_eliminar') }}</div> @endif
+    @if(session('error_general')) <div class="alert alert-error"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg> {{ session('error_general') }}</div> @endif
+    @if($errors->any()) <div class="alert alert-error"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg> {{ $errors->first() }}</div> @endif
+
+    @can('admin')
+    <div class="action-buttons" style="margin-bottom: 30px;">
+        <button class="btn-action" id="btn-toggle-estudio">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            Estudio Téc. (Ver Info)
+        </button>
+        <button class="btn-action" id="btn-toggle-modificar">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+            Modificar Perfil
+        </button>
+        <button class="btn-action danger" id="btn-toggle-eliminar">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+            Borrar Acceso
+        </button>
+    </div>
+
+    <!-- FORMULARIO ESTUDIO -->
+    <div class="form-container d-none" id="container-estudio">
+        <h3>Estudio Analítico de Usuario</h3>
+        <p id="estudio-error-msg" class="error-text d-none" style="margin-bottom: 15px;"></p>
+        <div class="form-grid">
+            <div class="field" style="max-width: 400px;">
+                <label>Carnet ID a estudiar:</label>
+                <input type="text" id="ci-estudio" placeholder="Ingrese CI de la persona..." autocomplete="off">
+            </div>
+        </div>
+
+        <div id="study-results" class="study-box d-none" style="margin-top: 24px; padding: 24px; background: #f8fafc; border-radius: var(--radius-md); border: 1px dashed var(--border);">
+            <h4 style="margin: 0 0 12px 0; color:var(--primary);">Ficha Personal: <span id="study-name"></span></h4>
+            <p style="margin: 8px 0; font-size: 0.95rem;"><strong>Correo Contacto:</strong> <span id="study-mail"></span></p>
+            <p style="margin: 8px 0; font-size: 0.95rem;"><strong>Tipo Perfil:</strong> <span id="study-tipo"></span></p>
+
+            <h4 style="margin: 20px 0 12px 0; color:var(--text-main);">Historial de Roles / Asignaciones Activas:</h4>
+            <ul class="task-list" id="study-tasks">
+                <!-- Javascript rellenará aquí -->
+            </ul>
+        </div>
+    </div>
+
+    <!-- FORMULARIO MODIFICAR -->
+    <div class="form-container d-none" id="container-modificar">
+        <h3>Modificar Perfil Operativo</h3>
+
+        <div class="form-grid" style="margin-bottom: 24px;">
+            <div class="field" style="grid-column: 1 / -1; max-width: 400px;">
+                <label>Buscar Carnet por Modificar:</label>
+                <input type="text" id="ci-modificar" placeholder="ID de la persona a editar...">
+                <span id="modificar-error-msg" class="error-text d-none"></span>
+            </div>
+        </div>
+        
+        <form id="form-modificar" action="#" method="POST" style="border-top: 1px dashed var(--border); padding-top: 24px;">
             @csrf
-            <button type="submit" class="btn-logout">Cerrar sesión</button>
+            @method('PUT')
+            <div class="form-grid">
+                <div class="field"><label>Nombre</label><input type="text" id="modnombre" name="nombre" required></div>
+                <div class="field"><label>Apellido</label><input type="text" id="modapellido" name="apellido" required></div>
+                <div class="field"><label>Teléfono</label><input type="text" id="modtelefono" name="telefono"></div>
+                <div class="field">
+                    <label>Sexo</label>
+                    <select id="modsexo" name="sexo">
+                        <option value="M">Masculino (M)</option>
+                        <option value="F">Femenino (F)</option>
+                    </select>
+                </div>
+                <div class="field"><label>Correo Electrónico (Auth)</label><input type="email" id="modcorreo" name="correo" required></div>
+                <div class="field"><label>Domicilio</label><input type="text" id="moddomicilio" name="domicilio"></div>
+                <div class="field"><label>Tipo de Persona</label><input type="text" id="modtipo" name="tipoPersona" required></div>
+            </div>
+            <div style="margin-top: 24px; text-align: right;">
+                <button type="submit" class="btn-save">Actualizar Perfil</button>
+            </div>
         </form>
     </div>
 
-    <div class="wrap">
-        <h1>Gestión de Personal y Usuarios</h1>
-        <p class="subtitle">Directorio de recursos humanos, administradores y clientes.</p>
-
-        @if(session('success')) <div class="alert alert-success">{{ session('success') }}</div> @endif
-        @if(session('success_eliminar')) <div class="alert alert-success">{{ session('success_eliminar') }}</div> @endif
-        @if(session('error_general')) <div class="alert alert-error">{{ session('error_general') }}</div> @endif
-        @if($errors->any()) <div class="alert alert-error">{{ $errors->first() }}</div> @endif
-
-        @can('admin')
-        <div class="action-buttons">
-            <button class="btn-action" id="btn-toggle-estudio" onclick="toggleForm('estudio')">Estudio Téc. (Ver Info)</button>
-            <button class="btn-action" id="btn-toggle-modificar" onclick="toggleForm('modificar')">Modificar Perfil</button>
-            <button class="btn-action" id="btn-toggle-eliminar" onclick="toggleForm('eliminar')" style="color: var(--danger); border-color: var(--danger);">Borrar Acceso</button>
-        </div>
-
-        <!-- FORMULARIO ESTUDIO -->
-        <div class="form-container d-none" id="container-estudio">
-            <h3>Estudio Analítico de Usuario</h3>
-            <p id="estudio-error-msg" class="error-text d-none" style="margin-bottom: 12px;"></p>
+    <!-- FORMULARIO ELIMINAR -->
+    <div class="form-container danger d-none" id="container-eliminar">
+        <h3 style="display: flex; align-items: center; gap: 8px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+            Eliminar usuario irrevocablemente
+        </h3>
+        <form id="form-eliminar" action="#" method="POST">
+            @csrf
+            @method('DELETE')
             <div class="form-grid">
-                <div class="field">
-                    <label>Carnet ID a estudiar:</label>
-                    <input type="text" id="ci-estudio" placeholder="Ingrese CI de la persona..." autocomplete="off">
+                <div class="field" style="max-width: 300px;">
+                    <label>Carnet de Identidad</label>
+                    <input type="text" id="ci-eliminar" name="ci" placeholder="Digita el CI de la persona" required>
+                    <span id="eliminar-error-msg" class="error-text d-none"></span>
+                </div>
+                <div class="field" style="max-width: 300px;">
+                    <label>Usuario a eliminar</label>
+                    <input type="text" id="delnombre" placeholder="Sujeto (Autocompletado)" readonly style="background: var(--bg-light); cursor:not-allowed;">
                 </div>
             </div>
-            
-            <div id="study-results" class="study-box d-none">
-                <h4 style="margin: 0 0 10px 0; color:var(--accent);">Ficha Personal: <span id="study-name"></span></h4>
-                <p style="margin: 5px 0; font-size: 0.9rem;"><strong>Correo Contacto:</strong> <span id="study-mail"></span></p>
-                <p style="margin: 5px 0; font-size: 0.9rem;"><strong>Tipo Perfil:</strong> <span id="study-tipo"></span></p>
-                
-                <h4 style="margin: 15px 0 10px 0; color:#334155;">Historial de Roles / Asignaciones Activas:</h4>
-                <ul class="task-list" id="study-tasks">
-                    <!-- Javascript rellenará aquí -->
-                </ul>
+            <div style="margin-top: 20px;">
+                <button type="submit" class="btn-logout" style="width: 100%; max-width: 300px;">Destruir Cuenta</button>
             </div>
-        </div>
+        </form>
+    </div>
+    @endcan
 
-        <!-- FORMULARIO MODIFICAR -->
-        <div class="form-container d-none" id="container-modificar">
-            <h3>Modificar Perfil Operativo</h3>
-            
-            <div class="form-grid" style="margin-bottom: 10px;">
-                <div class="field" style="grid-column: 1 / -1;">
-                    <label>Buscar Carnet por Modificar:</label>
-                    <input type="text" id="ci-modificar" placeholder="ID de la persona a editar..." style="max-width: 300px;">
-                    <span id="modificar-error-msg" class="error-text d-none"></span>
+    <div class="card">
+        <h2 style="margin-bottom: 20px;">Directorio General</h2>
+        <div class="table-wrap">
+            @if($usuarios->count() > 0)
+                <table>
+                    <thead>
+                        <tr>
+                            <th>CI (Identidad)</th>
+                            <th>Nombre Completo</th>
+                            <th>Teléfono</th>
+                            <th>Correo Sincronizado</th>
+                            <th>Rol Social</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($usuarios as $u)
+                        <tr>
+                            <td><span class="badge">{{ $u->ci }}</span></td>
+                            <td><strong>{{ $u->nombre }} {{ $u->apellido }}</strong></td>
+                            <td class="muted">{{ $u->telefono ?? 'S/R' }}</td>
+                            <td>{{ $u->correo }}</td>
+                            <td>
+                                @if(strtoupper($u->tipoPersona) == 'ADMIN')
+                                    <span class="badge bg-insert">{{ $u->tipoPersona }}</span>
+                                @else
+                                    <span class="badge">{{ $u->tipoPersona }}</span>
+                                @endif
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            @else
+                <div style="padding:40px; text-align:center; background:#f8fafc; border-radius:var(--radius-sm); border:1px dashed var(--border);">
+                    <p style="color:var(--text-muted); font-weight:500; font-size:1.1rem;">No hay base de usuarios instalada.</p>
                 </div>
-            </div>
-            <form id="form-modificar" action="#" method="POST">
-                @csrf
-                @method('PUT')
-                <div class="form-grid" style="padding-top:10px; border-top: 1px solid #e2e8f0;">
-                    <div class="field"><label>Nombre</label><input type="text" id="modnombre" name="nombre" required></div>
-                    <div class="field"><label>Apellido</label><input type="text" id="modapellido" name="apellido" required></div>
-                    <div class="field"><label>Teléfono</label><input type="text" id="modtelefono" name="telefono"></div>
-                    <div class="field">
-                        <label>Sexo</label>
-                        <select id="modsexo" name="sexo">
-                            <option value="M">Masculino (M)</option>
-                            <option value="F">Femenino (F)</option>
-                        </select>
-                    </div>
-                    <div class="field"><label>Correo Electrónico (Auth)</label><input type="email" id="modcorreo" name="correo" required></div>
-                    <div class="field"><label>Domicilio</label><input type="text" id="moddomicilio" name="domicilio"></div>
-                    <div class="field"><label>Tipo de Persona</label><input type="text" id="modtipo" name="tipoPersona" required></div>
-                    <button type="submit" class="btn-save" style="margin-top: 15px;">Actualizar</button>
-                </div>
-            </form>
-        </div>
-
-        <!-- FORMULARIO ELIMINAR -->
-        <div class="form-container d-none" id="container-eliminar" style="border-color: #fca5a5; background-color: #fef2f2;">
-            <h3 style="color: var(--danger);">Eliminar usuario irrevocablemente</h3>
-            <form id="form-eliminar" action="#" method="POST">
-                @csrf
-                @method('DELETE')
-                <div class="form-grid">
-                    <div class="field">
-                        <input type="text" id="ci-eliminar" name="ci" placeholder="Digita el CI de la persona" required style="border-color: #fca5a5;">
-                        <span id="eliminar-error-msg" class="error-text d-none"></span>
-                    </div>
-                    <div class="field"><input type="text" id="delnombre" placeholder="Sujeto (Autocompletado)" readonly style="background:#f1f5f9; cursor:not-allowed;"></div>
-                    <button type="submit" class="btn-logout" onclick="return confirm('¿Confirmas borrar esta alma tanto del Motor de Tienda como del Motor Auth?');" style="grid-column: 1 / -1; margin-top:10px; width: 100%;">Destruir Cuenta</button>
-                </div>
-            </form>
-        </div>
-        @endcan
-
-        <div class="catalog">
-            <h2>Directorio General</h2>
-            <div class="table-wrap">
-                @if($usuarios->count() > 0)
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>CI (Identidad)</th>
-                                <th>Nombre Completo</th>
-                                <th>Teléfono</th>
-                                <th>Correo Sincronizado</th>
-                                <th>Rol Social</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($usuarios as $u)
-                            <tr>
-                                <td><span class="badge">{{ $u->ci }}</span></td>
-                                <td><strong>{{ $u->nombre }} {{ $u->apellido }}</strong></td>
-                                <td style="color:var(--muted)">{{ $u->telefono ?? 'S/R' }}</td>
-                                <td>{{ $u->correo }}</td>
-                                <td>{{ $u->tipoPersona }}</td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                @else
-                    <p style="color:var(--muted); font-weight:500;">No hay base de usuarios instalada.</p>
-                @endif
-            </div>
+            @endif
         </div>
     </div>
+</div>
+@endsection
 
-<script>
-    function toggleForm(tipo) {
-        document.getElementById('container-estudio').classList.add('d-none');
-        document.getElementById('container-modificar').classList.add('d-none');
-        document.getElementById('container-eliminar').classList.add('d-none');
-        document.querySelectorAll('.btn-action').forEach(b => b.classList.remove('active'));
-
-        document.getElementById('container-' + tipo).classList.remove('d-none');
-        document.getElementById('btn-toggle-' + tipo).classList.add('active');
-    }
-
-    // LÓGICA DEL ESTUDIO (SHOW)
-    document.getElementById('ci-estudio').addEventListener('input', function() {
-        clearTimeout(window.estudioTimeout);
-        let errorMsg = document.getElementById('estudio-error-msg');
-        let studyBox = document.getElementById('study-results');
-        errorMsg.classList.add('d-none');
-        studyBox.classList.add('d-none');
-        
-        let ci = this.value;
-        if (!ci) return;
-
-        window.estudioTimeout = setTimeout(() => {
-            fetch('/api/usuario/' + ci)
-                .then(res => res.json())
-                .then(data => {
-                    if(data.success) {
-                        let u = data.usuario;
-                        document.getElementById('study-name').textContent = u.nombre + ' ' + (u.apellido || '');
-                        document.getElementById('study-mail').textContent = u.correo;
-                        document.getElementById('study-tipo').textContent = u.tipoPersona;
-                        
-                        let taskList = document.getElementById('study-tasks');
-                        taskList.innerHTML = '';
-                        if(data.detalles_estudio_asignaciones && data.detalles_estudio_asignaciones.length > 0) {
-                            data.detalles_estudio_asignaciones.forEach(asig => {
-                                let li = document.createElement('li');
-                                li.innerHTML = `<strong>${asig.rol.nombre}:</strong> Iniciado ${asig.fechaInicio}. <span class="badge">${asig.estado}</span>`;
-                                taskList.appendChild(li);
-                            });
-                        } else {
-                            taskList.innerHTML = '<li style="border-left:3px solid #cbd5e1; color:#64748b;">El sistema indica que este usuario no tiene historial de labores asignadas.</li>';
-                        }
-
-                        studyBox.classList.remove('d-none');
-                    } else {
-                        errorMsg.textContent = 'Individuo no hallado en la base de datos empresarial.';
-                        errorMsg.classList.remove('d-none');
-                    }
-                });
-        }, 500);
-    });
-
-    // LÓGICA DE MODIFICAR (UPDATE)
-    document.getElementById('ci-modificar').addEventListener('input', function() {
-        clearTimeout(window.modTimeout);
-        let errorMsg = document.getElementById('modificar-error-msg');
-        errorMsg.classList.add('d-none');
-        
-        let ci = this.value;
-        if (!ci) return;
-
-        window.modTimeout = setTimeout(() => {
-            fetch('/api/usuario/' + ci)
-                .then(res => res.json())
-                .then(data => {
-                    if(data.success) {
-                        let u = data.usuario;
-                        document.getElementById('modnombre').value = u.nombre;
-                        document.getElementById('modapellido').value = u.apellido || '';
-                        document.getElementById('modtelefono').value = u.telefono || '';
-                        document.getElementById('modsexo').value = u.sexo || 'M';
-                        document.getElementById('modcorreo').value = u.correo;
-                        document.getElementById('moddomicilio').value = u.domicilio || '';
-                        document.getElementById('modtipo').value = u.tipoPersona || '';
-                        
-                        // Forzar el endpoint correcto en el formulario
-                        document.getElementById('form-modificar').action = "{{ url('usuarios') }}/" + encodeURIComponent(ci);
-                    } else {
-                        errorMsg.textContent = 'Ese carnet no está en las listas.';
-                        errorMsg.classList.remove('d-none');
-                    }
-                })
-                .catch(err => {
-                    console.error("Fetch error:", err);
-                    errorMsg.textContent = 'Error de conexión o datos no válidos.';
-                    errorMsg.classList.remove('d-none');
-                });
-        }, 500); 
-    });
-
-    // LÓGICA DE ELIMINAR (DESTROY)
-    document.getElementById('ci-eliminar').addEventListener('input', function() {
-        clearTimeout(window.delTimeout);
-        let errorMsg = document.getElementById('eliminar-error-msg');
-        errorMsg.classList.add('d-none');
-        
-        let ci = this.value;
-        if (!ci) { document.getElementById('delnombre').value = ''; return; }
-
-        window.delTimeout = setTimeout(() => {
-            fetch('/api/usuario/' + ci)
-                .then(res => res.json())
-                .then(data => {
-                    if(data.success) {
-                        let u = data.usuario;
-                        document.getElementById('delnombre').value = 'Objetivo Activo: ' + u.nombre + ' ' + u.correo;
-                        document.getElementById('form-eliminar').action = "{{ url('usuarios') }}/" + ci;
-                    } else {
-                        errorMsg.textContent = 'Persona fantasma.';
-                        errorMsg.classList.remove('d-none');
-                        document.getElementById('delnombre').value = '';
-                    }
-                });
-        }, 500); 
-    });
-</script>
-</body>
-</html>
+@push('scripts')
+<script src="{{ asset('js/ferreteria-usuarios.js') }}"></script>
+@endpush

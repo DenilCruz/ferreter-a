@@ -14,7 +14,26 @@ class Producto extends Model
 
     public function categoria()
     {
-    // Un producto pertenece a una categoría
-    return $this->belongsTo(Categoria::class, 'id_categoria', 'idcategoria');
+        return $this->belongsTo(Categoria::class, 'id_categoria', 'idcategoria');
+    }
+
+    public function marca()
+    {
+        return $this->belongsTo(Marca::class, 'id_marca', 'id');
+    }
+
+    public function color()
+    {
+        return $this->belongsTo(Color::class, 'id_color', 'id');
+    }
+
+    public function medida()
+    {
+        return $this->belongsTo(Medida::class, 'id_medida', 'id');
+    }
+
+    public function volumen()
+    {
+        return $this->belongsTo(Volumen::class, 'id_volumen', 'id');
     }
 }

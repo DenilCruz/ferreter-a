@@ -12,104 +12,70 @@ class ProductoController extends Controller
      */
     public function index()
     {
-        // 1. Para el árbol de abajo (solo las raíces/padres)
+        // 1. Cargamos las categorías raíces con sus productos y subcategorías
         $categorias = \App\Models\Categoria::whereNull('id_categoria_padre')
                         ->with(['subcategorias', 'productos'])
                         ->get();
                         
-        // 2. Para el formulario (absolutamente TODAS las categorías)
+        // 2. Cargamos todas las categorías para los select de los formularios
         $categorias_formulario = \App\Models\Categoria::all();
 
-        // Pasamos ambas variables a la vista
-        return view('productos.index', compact('categorias', 'categorias_formulario'));
+        // 3. DETERMINAR VISTA SEGÚN ROL
+        // Administrador
+        if (\Illuminate\Support\Facades\Gate::allows('admin')) {
+            return view('inventario.roles.admin', compact('categorias', 'categorias_formulario'));
+        }
+
+        // Almacenero
+        if (\Illuminate\Support\Facades\Gate::allows('almacenero')) {
+            return view('inventario.roles.almacenero', compact('categorias', 'categorias_formulario'));
+        }
+
+        // Público / Cliente
+        return view('inventario.roles.cliente', compact('categorias', 'categorias_formulario'));
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Muestra el formulario para crear un nuevo producto.
      */
     public function create()
     {
-        //
+        $categorias_formulario = \App\Models\Categoria::all();
+        $marcas = \App\Models\Marca::all();
+        return view('inventario.create', compact('categorias_formulario', 'marcas'));
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Guarda el nuevo producto.
      */
     public function store(Request $request)
     {
-        $validated = $request->validate(
-            [
-                'idproducto' => ['required', 'integer', 'min:1', 'unique:producto,idproducto'],
-                'nombre' => ['required', 'string', 'max:255'],
-                'descripcion' => ['nullable', 'string', 'max:500'],
-                'precio' => ['required', 'numeric', 'min:0'],
-                'cantidad' => ['required', 'integer', 'min:0'],
-                'id_marca' => ['required', 'integer', 'exists:marca,id'],
-                'id_categoria' => ['required', 'integer', 'exists:categoria,idcategoria'],
-                'fechacaducidad' => ['nullable', 'date'],
-                'id_color' => ['nullable', 'integer'],
-                'id_medida' => ['nullable', 'integer'],
-                'id_volumen' => ['nullable', 'integer'],
-            ],
-            [
-                'idproducto.required' => 'El ID del producto es obligatorio.',
-                'idproducto.integer' => 'El ID del producto debe ser un número entero.',
-                'idproducto.min' => 'El ID del producto debe ser mayor a 0.',
-                'idproducto.unique' => 'Ese ID de producto ya existe.',
-                'nombre.required' => 'El nombre del producto es obligatorio.',
-                'nombre.max' => 'El nombre no puede superar 255 caracteres.',
-                'descripcion.max' => 'La descripción no puede superar 500 caracteres.',
-                'precio.required' => 'El precio es obligatorio.',
-                'precio.numeric' => 'El precio debe ser numérico.',
-                'precio.min' => 'El precio no puede ser negativo.',
-                'cantidad.required' => 'La cantidad es obligatoria.',
-                'cantidad.integer' => 'La cantidad debe ser un número entero.',
-                'cantidad.min' => 'La cantidad no puede ser negativa.',
-                'id_marca.required' => 'El ID de marca es obligatorio.',
-                'id_marca.integer' => 'El ID de marca debe ser un número entero.',
-                'id_marca.exists' => 'La marca indicada no existe.',
-                'id_categoria.required' => 'Debes seleccionar una categoría.',
-                'id_categoria.integer' => 'La categoría debe ser un valor numérico válido.',
-                'id_categoria.exists' => 'La categoría seleccionada no existe.',
-            ]
-        );
+        $validated = $request->validate([
+            'idproducto' => ['required', 'integer', 'unique:producto,idproducto'],
+            'nombre' => ['required', 'string', 'max:255'],
+            'descripcion' => ['nullable', 'string'],
+            'precio' => ['required', 'numeric', 'min:0'],
+            'cantidad' => ['required', 'integer', 'min:0'],
+            'id_marca' => ['required', 'integer'],
+            'id_categoria' => ['required', 'integer'],
+        ]);
 
-        try {
-            $producto = \App\Models\Producto::create($validated);
+        $producto = \App\Models\Producto::create($validated);
+        
+        \App\Models\Bitacora::registrar('INSERTAR', 'producto', $producto->idproducto, "Creación de producto: {$producto->nombre}");
 
-            // REGISTRO EN BITÁCORA
-            \App\Models\Bitacora::registrar(
-                'INSERTAR',
-                'producto',
-                $producto->idproducto,
-                "Se creó el producto: {$producto->nombre}"
-            );
-
-            return redirect()->back()->with('success', 'Producto registrado correctamente.');
-        } catch (QueryException $e) {
-            return redirect()
-                ->back()
-                ->withInput()
-                ->withErrors([
-                    'form' => 'No se pudo guardar el producto. Verifica los datos ingresados e intenta nuevamente.',
-                ]);
-        }
+        return redirect()->route('inventario')->with('success', '¡Producto creado con éxito!');
     }
 
     /**
-     * Display the specified resource.
+     * Muestra el formulario para editar un producto.
      */
-    public function show(string $id)
+    public function edit($id)
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
+        $producto = \App\Models\Producto::where('idproducto', $id)->firstOrFail();
+        $categorias_formulario = \App\Models\Categoria::all();
+        $marcas = \App\Models\Marca::all();
+        return view('inventario.edit', compact('producto', 'categorias_formulario', 'marcas'));
     }
 
     public function update(Request $request, string $id)
@@ -166,6 +132,16 @@ class ProductoController extends Controller
             return response()->json(['success' => true, 'producto' => $producto]);
         }
         return response()->json(['success' => false, 'message' => 'Producto no encontrado'], 404);
+    }
+
+    public function showPublic($id)
+    {
+        // ElOrFail valida que exista y lanza 404 si no.
+        $producto = \App\Models\Producto::with(['categoria', 'marca', 'color', 'medida', 'volumen'])
+                        ->where('idproducto', $id)
+                        ->firstOrFail();
+
+        return view('inventario.producto-detalle', compact('producto'));
     }
 
     public function destroy(string $id)

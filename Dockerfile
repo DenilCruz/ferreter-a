@@ -1,17 +1,3 @@
-FROM node:20-alpine AS assets
-
-WORKDIR /app
-
-COPY package*.json ./
-RUN npm ci
-
-COPY resources ./resources
-COPY public ./public
-COPY vite.config.js ./
-COPY postcss.config.js ./
-COPY tailwind.config.js ./
-RUN npm run build
-
 FROM php:8.4-cli
 
 RUN apt-get update && apt-get install -y \
@@ -29,7 +15,6 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 WORKDIR /var/www
 
 COPY . .
-COPY --from=assets /app/public/build /var/www/public/build
 RUN rm -f /var/www/public/hot
 
 RUN composer install --no-dev --prefer-dist --optimize-autoloader --no-interaction

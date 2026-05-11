@@ -28,7 +28,12 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        \App\Models\Bitacora::registrar('Login', 'users', Auth::id(), 'Inicio de sesión exitoso');
+        \App\Models\Bitacora::registrar('Login', 'usuario', Auth::user()->ci, 'Inicio de sesión exitoso');
+
+        // Redirección inteligente por ROL
+        if (Auth::user()->tipoPersona === 'C') {
+            return redirect()->route('inventario');
+        }
 
         return redirect()->intended(route('dashboard', absolute: false));
     }

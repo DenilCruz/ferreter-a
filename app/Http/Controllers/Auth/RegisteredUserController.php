@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
+use App\Models\Usuario;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -31,21 +31,28 @@ class RegisteredUserController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
-            'password' => ['required','confirmed',Rules\Password::min(8)->mixedCase()->numbers()],
+            'ci' => ['required', 'integer', 'unique:usuario,ci'],
+            'nombre' => ['required', 'string', 'max:50'],
+            'apellido' => ['required', 'string', 'max:50'],
+            'sexo' => ['required', 'string', 'max:1'],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:usuario,email'],
+            'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
-        $user = User::create([
-            'name' => $request->name,
+        $user = Usuario::create([
+            'ci' => $request->ci,
+            'nombre' => $request->nombre,
+            'apellido' => $request->apellido,
+            'sexo' => $request->sexo,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'tipoPersona' => 'C', // Usamos 'C' para Clientes según tu estándar
         ]);
 
         event(new Registered($user));
 
         Auth::login($user);
 
-        return redirect(route('dashboard', absolute: false));
+        return redirect(route('inventario', absolute: false));
     }
 }

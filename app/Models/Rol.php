@@ -10,7 +10,7 @@ class Rol extends Model
     protected $primaryKey = 'id';
     public $timestamps = false;
 
-    protected $fillable = ['nombre', 'descripcion'];
+    protected $fillable = ['id', 'nombre', 'descripcion'];
 
     public function asignaciones()
     {
