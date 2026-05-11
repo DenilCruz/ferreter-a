@@ -144,7 +144,7 @@ class TrabajoController extends Controller
 
             Cliente::firstOrCreate(
                 ['ci' => $request->ci_empleado],
-                ['puntos' => 0]
+                []
             );
 
             Empleado::where('ci', $request->ci_empleado)
