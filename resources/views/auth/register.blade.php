@@ -55,6 +55,9 @@
             <div>
                 <label for="password">Contraseña</label>
                 <input id="password" type="password" name="password" required placeholder="••••••••">
+                <small style="color: var(--text-muted, #6b7280); font-size: 0.78rem; margin-top: 4px; display: block;">
+                    Mínimo 8 caracteres con mayúsculas, minúsculas y números. Ej: <em>Texto12345</em>
+                </small>
                 <x-input-error :messages="$errors->get('password')" />
             </div>
 

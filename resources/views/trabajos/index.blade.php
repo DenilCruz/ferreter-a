@@ -34,19 +34,53 @@
         color: #fff;
     }
 
+    /* Celdas del grid no se expanden más allá del viewport */
+    .trabajos-grid > * {
+        min-width: 0;
+        max-width: 100%;
+    }
+
     /* Tabla responsive: scroll en móvil */
     .table-responsive {
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
+        width: 100%;
+        max-width: 100%;
+        display: block;
     }
+    .table-responsive table { min-width: 520px; }
 
     /* Columna acciones no colapsa */
     .col-acciones { width: 110px; text-align: center; }
 
+    /* Formularios del panel lateral */
+    .trabajos-forms select,
+    .trabajos-forms input[type="text"],
+    .trabajos-forms button {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    @media (max-width: 900px) {
+        .trabajos-forms {
+            width: 100%;
+            max-width: 100%;
+        }
+    }
+
     @media (max-width: 600px) {
-        .page-header h1 { font-size: 1.4rem; }
-        .card { padding: 18px; }
+        .page-header h1 { font-size: 1.3rem; }
+        .card { padding: 16px; }
         .trabajos-forms { gap: 16px; }
+        .baja-btn { font-size: 0.75rem; padding: 4px 8px; }
+        .col-fecha-inicio { display: none; }
+    }
+
+    @media (max-width: 480px) {
+        .trabajos-grid { gap: 20px; }
+        .table-responsive th,
+        .table-responsive td { padding: 10px 8px; }
+        .col-acciones { width: auto; }
     }
 </style>
 
@@ -93,7 +127,7 @@
                             <tr>
                                 <th>Rol / Trabajo</th>
                                 @if($isAdmin)<th>Empleado</th>@endif
-                                <th>Fecha Inicio</th>
+                                <th class="col-fecha-inicio">Fecha Inicio</th>
                                 <th>Estado</th>
                                 @if($isAdmin)<th class="col-acciones">Acciones</th>@endif
                             </tr>
@@ -111,7 +145,7 @@
                                     <div style="font-size: 0.8rem;" class="muted">CI: {{ $asignacion->ci_empleado }}</div>
                                 </td>
                                 @endif
-                                <td style="white-space: nowrap;">{{ $asignacion->fechaInicio }}</td>
+                                <td class="col-fecha-inicio" style="white-space: nowrap;">{{ $asignacion->fechaInicio }}</td>
                                 <td>
                                     <span class="badge {{ strtolower($asignacion->estado) == 'activo' ? 'activo' : '' }}">
                                         {{ $asignacion->estado }}
@@ -146,7 +180,7 @@
 
         {{-- ── Panel lateral admin ── --}}
         @can('admin')
-        <div style="display:flex; flex-direction:column; gap:24px;" class="trabajos-forms">
+        <div style="display:flex; flex-direction:column; gap:24px; min-width:0; max-width:100%; width:100%;" class="trabajos-forms">
 
             <div class="card" style="margin-bottom: 0;">
                 <h2 style="display: flex; align-items: center; gap: 8px; font-size: 1.1rem;">
@@ -183,11 +217,11 @@
                     @csrf
                     <div class="field" style="margin-bottom: 14px;">
                         <label>Nombre del Trabajo</label>
-                        <input type="text" name="nombre" placeholder="Ej: Gerente, Vendedor" required style="background: white;">
+                        <input type="text" name="nombre" placeholder="Ej: Gerente, Vendedor" required style="background: white; width: 100%; box-sizing: border-box;">
                     </div>
                     <div class="field" style="margin-bottom: 20px;">
                         <label>Descripción</label>
-                        <input type="text" name="descripcion" placeholder="Breve descripción" style="background: white;">
+                        <input type="text" name="descripcion" placeholder="Breve descripción" style="background: white; width: 100%; box-sizing: border-box;">
                     </div>
                     <button type="submit" class="btn-action" style="width: 100%;">Crear Rol en Sistema</button>
                 </form>

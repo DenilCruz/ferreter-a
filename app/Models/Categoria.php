@@ -9,17 +9,20 @@ class Categoria extends Model
     protected $table = 'categoria';
     protected $primaryKey = 'idcategoria';
     public $timestamps = false;
-    protected $fillable = ['idcategoria', 'nombre', 'descripcion', 'id_categoria_padre'];
+    protected $fillable = ['idcategoria', 'nombre', 'descripcion', 'id_categoria_padre', 'imagen', 'estado'];
 
-    // Relación: Una categoría tiene muchos productos
     public function productos()
     {
         return $this->hasMany(Producto::class, 'id_categoria', 'idcategoria');
     }
 
-    // Relación RECURSIVA: Una categoría tiene muchas subcategorías
     public function subcategorias()
     {
         return $this->hasMany(Categoria::class, 'id_categoria_padre', 'idcategoria');
+    }
+
+    public function padre()
+    {
+        return $this->belongsTo(Categoria::class, 'id_categoria_padre', 'idcategoria');
     }
 }

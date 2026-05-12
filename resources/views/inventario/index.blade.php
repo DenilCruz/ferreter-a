@@ -3,7 +3,7 @@
 @section('title', 'Ferretería Guisella - Inventario')
 
 @section('content')
-    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 30px;">
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 30px; flex-wrap: wrap; gap: 16px;">
         <div>
             <h1 style="margin: 0;">Catálogo de Productos</h1>
             <p class="subtitle" style="margin: 0;">Gestión de inventario y stock</p>

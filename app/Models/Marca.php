@@ -8,7 +8,7 @@ class Marca extends Model
 {
     protected $table = 'marca';
     public $timestamps = false;
-    protected $fillable = ['id', 'nombre'];
+    protected $fillable = ['id', 'nombre', 'logo', 'estado'];
 
     public function productos()
     {
