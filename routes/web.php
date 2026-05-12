@@ -4,20 +4,15 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\TrabajoController;
-<<<<<<< Updated upstream
-=======
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\MarcaController;
 use App\Http\Controllers\CategoriaController;
->>>>>>> Stashed changes
 use Illuminate\Support\Facades\Route;
 
 // ─────────────────────────────────────────────────────────
 // PÚBLICAS — accesibles sin login
 // ─────────────────────────────────────────────────────────
 Route::get('/', [ProductoController::class, 'index'])->name('inventario');
-<<<<<<< Updated upstream
-=======
 Route::get('/catalogo/producto/{id}', [ProductoController::class, 'showPublic'])->name('producto.show');
 
 // Marcas públicas
@@ -34,7 +29,6 @@ Route::post('/carrito/add', [CartController::class, 'add'])->name('carrito.add')
 Route::post('/carrito/update', [CartController::class, 'update'])->name('carrito.update');
 Route::post('/carrito/remove', [CartController::class, 'remove'])->name('carrito.remove');
 Route::post('/carrito/clear', [CartController::class, 'clear'])->name('carrito.clear');
->>>>>>> Stashed changes
 
 // ─────────────────────────────────────────────────────────
 // AUTENTICADAS — requieren login

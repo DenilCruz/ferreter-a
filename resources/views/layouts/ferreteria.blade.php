@@ -66,12 +66,9 @@
                 </form>
             @else
                 {{-- Visitante no autenticado --}}
-<<<<<<< Updated upstream
-=======
                 <a href="{{ url('/') }}" class="{{ request()->is('/') ? 'active' : '' }}">Catálogo</a>
                 <a href="{{ route('marcas.index') }}" class="{{ request()->routeIs('marcas.*') ? 'active' : '' }}">Marcas</a>
                 <a href="{{ route('categorias.index') }}" class="{{ request()->routeIs('categorias.*') ? 'active' : '' }}">Categorías</a>
->>>>>>> Stashed changes
                 <a href="{{ route('login') }}">Iniciar sesión</a>
                 <a href="{{ route('register') }}">Registrarse</a>
             @endauth
@@ -109,12 +106,9 @@
                     <button type="submit" class="btn-logout">Salir</button>
                 </form>
             @else
-<<<<<<< Updated upstream
-=======
                 <a href="{{ url('/') }}" class="{{ request()->is('/') ? 'active' : '' }}">Catálogo</a>
                 <a href="{{ route('marcas.index') }}" class="{{ request()->routeIs('marcas.*') ? 'active' : '' }}">Marcas</a>
                 <a href="{{ route('categorias.index') }}" class="{{ request()->routeIs('categorias.*') ? 'active' : '' }}">Categorías</a>
->>>>>>> Stashed changes
                 <a href="{{ route('login') }}">Iniciar sesión</a>
                 <a href="{{ route('register') }}">Registrarse</a>
             @endauth
