@@ -78,6 +78,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
             $registros = \App\Models\Bitacora::orderBy('created_at', 'desc')->get();
             return view('bitacora.index', compact('registros'));
         })->name('bitacora.index');
+
+        // Gestión de Cajas
+        Route::get('/caja', [\App\Http\Controllers\Admin\CajaController::class, 'index'])->name('caja.index');
+        Route::post('/caja/apertura', [\App\Http\Controllers\Admin\CajaController::class, 'apertura'])->name('caja.apertura');
+        Route::post('/caja/corte/{caja}', [\App\Http\Controllers\Admin\CajaController::class, 'corte'])->name('caja.corte');
+        Route::get('/caja/reporte/{caja}', [\App\Http\Controllers\Admin\CajaController::class, 'reporte'])->name('caja.reporte');
     });
 });
 
