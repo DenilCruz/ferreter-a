@@ -149,6 +149,9 @@ class ProductoController extends Controller
         try {
             $producto = \App\Models\Producto::where('idproducto', $id)->firstOrFail();
             $nombre = $producto->nombre;
+
+            // Al usar SoftDeletes en el modelo, esto no borra el registro de la DB,
+            // solo le pone una fecha en 'deleted_at'. Así no se rompen las ventas/referencias.
             $producto->delete();
 
             // REGISTRO EN BITÁCORA
@@ -156,16 +159,14 @@ class ProductoController extends Controller
                 'ELIMINAR',
                 'producto',
                 $id,
-                "Se eliminó el producto: {$nombre}"
+                "Se eliminó lógicamente el producto: {$nombre}"
             );
 
-            return redirect()->back()->with('success', 'Producto eliminado correctamente.');
+            return redirect()->route('inventario')->with('success', 'Producto eliminado exitosamente');
         } catch (\Exception $e) {
             return redirect()
                 ->back()
-                ->withErrors([
-                    'form_eliminar' => 'No se pudo eliminar el producto. Verifica que no existan otras referencias a este antes de eliminarlo.',
-                ]);
+                ->withErrors(['form_eliminar' => 'No se pudo eliminar el producto. Error: ' . $e->getMessage()]);
         }
     }
 }
