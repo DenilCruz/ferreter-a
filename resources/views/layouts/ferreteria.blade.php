@@ -157,6 +157,31 @@
 
     <div class="wrap @yield('wrap_class')">
 
+        {{-- Mensajes de Retroalimentación Globales --}}
+        @if(session('success'))
+            <div class="alert alert-success animate-fade-up" style="margin-bottom: 20px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                {{ session('success') }}
+            </div>
+        @endif
+
+        @if(session('error'))
+            <div class="alert alert-error animate-fade-up" style="margin-bottom: 20px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                {{ session('error') }}
+            </div>
+        @endif
+
+        @if($errors->any())
+            <div class="alert alert-error animate-fade-up" style="margin-bottom: 20px;">
+                <ul style="margin: 0; padding-left: 20px;">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
         {{-- Alerta de acceso denegado (redirigido por AdminMiddleware) --}}
         @if(session('error_acceso'))
             <div class="alert alert-error" style="margin-bottom: 20px;">
