@@ -53,6 +53,3 @@ Una vez configurado, puedes entrar con la cuenta de administrador generada:
 - **Gestión por Roles**: Vistas diferenciadas para Administradores, Almaceneros y Clientes.
 - **Seguridad**: Autenticación integrada con la base de datos de negocio original.
 - **Bitácora**: Registro automático de todas las acciones importantes (INSERT, UPDATE, DELETE).
-
----
-*Desarrollado con ❤️ para Ferretería Guisella.*
