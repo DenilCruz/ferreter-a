@@ -90,11 +90,8 @@
             @else
                 {{-- Visitante no autenticado --}}
                 <a href="{{ url('/') }}" class="{{ request()->is('/') ? 'active' : '' }}">Catálogo</a>
-<<<<<<< HEAD
-=======
                 <a href="{{ route('marcas.index') }}" class="{{ request()->routeIs('marcas.*') ? 'active' : '' }}">Marcas</a>
                 <a href="{{ route('categorias.index') }}" class="{{ request()->routeIs('categorias.*') ? 'active' : '' }}">Categorías</a>
->>>>>>> origin/luis-miguel
                 <a href="{{ route('login') }}">Iniciar sesión</a>
                 <a href="{{ route('register') }}">Registrarse</a>
             @endauth
@@ -146,11 +143,8 @@
                 </form>
             @else
                 <a href="{{ url('/') }}" class="{{ request()->is('/') ? 'active' : '' }}">Catálogo</a>
-<<<<<<< HEAD
-=======
                 <a href="{{ route('marcas.index') }}" class="{{ request()->routeIs('marcas.*') ? 'active' : '' }}">Marcas</a>
                 <a href="{{ route('categorias.index') }}" class="{{ request()->routeIs('categorias.*') ? 'active' : '' }}">Categorías</a>
->>>>>>> origin/luis-miguel
                 <a href="{{ route('login') }}">Iniciar sesión</a>
                 <a href="{{ route('register') }}">Registrarse</a>
             @endauth

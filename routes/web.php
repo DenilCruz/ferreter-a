@@ -5,11 +5,8 @@ use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\TrabajoController;
 use App\Http\Controllers\CartController;
-<<<<<<< HEAD
-=======
 use App\Http\Controllers\MarcaController;
 use App\Http\Controllers\CategoriaController;
->>>>>>> origin/luis-miguel
 use Illuminate\Support\Facades\Route;
 
 // ─────────────────────────────────────────────────────────
@@ -18,8 +15,6 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [ProductoController::class, 'index'])->name('inventario');
 Route::get('/catalogo/producto/{id}', [ProductoController::class, 'showPublic'])->name('producto.show');
 
-<<<<<<< HEAD
-=======
 // Marcas públicas
 Route::get('/marcas', [MarcaController::class, 'indexPublic'])->name('marcas.index');
 Route::get('/marcas/{id}/productos', [MarcaController::class, 'productosPorMarca'])->name('marcas.productos');
@@ -27,8 +22,6 @@ Route::get('/marcas/{id}/productos', [MarcaController::class, 'productosPorMarca
 // Categorías públicas
 Route::get('/categorias', [CategoriaController::class, 'indexPublic'])->name('categorias.index');
 Route::get('/categorias/{id}/productos', [CategoriaController::class, 'productosPorCategoria'])->name('categorias.productos');
-
->>>>>>> origin/luis-miguel
 // Rutas de Carrito (Públicas y para Auth)
 Route::get('/carrito', [CartController::class, 'index'])->name('carrito.index');
 Route::post('/carrito/add', [CartController::class, 'add'])->name('carrito.add');
