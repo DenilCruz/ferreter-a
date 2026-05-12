@@ -9,7 +9,15 @@
     <!-- Alpine.js (para los modales y botones) -->
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
-<body class="fg-body has-topbar">
+<body class="fg-body has-topbar" x-data="{ mobileMenuOpen: false, sidebarOpen: false }">
+
+    @php
+        $showSidebar = false;
+        if (Auth::check() && Auth::user()->tipoPersona !== 'C') {
+            // Mostrar el sidebar en TODAS las páginas si es administrador o personal operativo
+            $showSidebar = true;
+        }
+    @endphp
 
     {{-- ═══════════════════════════════════════════════════
          TOPBAR UNIFICADA — se muestra en todas las páginas
@@ -26,7 +34,14 @@
         }
     @endphp
 
-    <div class="topbar" x-data="{ mobileMenuOpen: false }">
+    <div class="topbar" :style="sidebarOpen ? 'left: 280px; transition: left 0.3s ease-in-out;' : 'left: 0; transition: left 0.3s ease-in-out;'">
+
+        {{-- Botón Toggle para Sidebar si es admin (Esquina superior izquierda) --}}
+        @if($showSidebar)
+            <button @click="sidebarOpen = !sidebarOpen" style="background: none; border: none; cursor: pointer; display: flex; align-items: center; color: var(--primary); padding: 8px; margin-right: 8px;" aria-label="Menú Lateral">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+            </button>
+        @endif
 
         {{-- Logo / Marca --}}
         <a href="{{ url('/') }}" class="topbar-brand">
@@ -56,22 +71,25 @@
             </a>
 
             @auth
-                {{-- Inventario visible para todos --}}
-                <a href="{{ url('/') }}" class="{{ request()->is('/') ? 'active' : '' }}">Catálogo</a>
-                <a href="{{ route('marcas.index') }}" class="{{ request()->routeIs('marcas.*') ? 'active' : '' }}">Marcas</a>
-                <a href="{{ route('categorias.index') }}" class="{{ request()->routeIs('categorias.*') ? 'active' : '' }}">Categorías</a>
+                @if(!$showSidebar)
+                    {{-- Inventario visible para todos (no admin) --}}
+                    <a href="{{ url('/') }}" class="{{ request()->is('/') ? 'active' : '' }}">Catálogo</a>
+                    <a href="{{ route('marcas.index') }}" class="{{ request()->routeIs('marcas.*') ? 'active' : '' }}">Marcas</a>
+                    <a href="{{ route('categorias.index') }}" class="{{ request()->routeIs('categorias.*') ? 'active' : '' }}">Categorías</a>
+                @endif
 
                 {{-- Solo personal operativo (Admin y Almaceneros) ven Trabajos --}}
                 @unless(Auth::user()->tipoPersona === 'C')
-                    <a href="{{ route('trabajos.index') }}" class="{{ request()->routeIs('trabajos.index') ? 'active' : '' }}">Trabajos</a>
-
-                    @can('admin')
-                        <a href="{{ route('admin.marcas.index') }}" class="{{ request()->routeIs('admin.marcas.*') ? 'active' : '' }}">Marcas Admin</a>
-                        <a href="{{ route('admin.categorias.index') }}" class="{{ request()->routeIs('admin.categorias.*') ? 'active' : '' }}">Categorías Admin</a>
-                        <a href="{{ route('usuarios.index') }}" class="{{ request()->routeIs('usuarios.*') ? 'active' : '' }}">Personal</a>
-                        <a href="{{ route('bitacora.index') }}" class="{{ request()->routeIs('bitacora.*') ? 'active' : '' }}">Bitácora</a>
-                        <a href="{{ route('caja.index') }}" class="{{ request()->routeIs('caja.*') ? 'active' : '' }}">Caja</a>
-                    @endcan
+                    @if(!$showSidebar)
+                        <a href="{{ route('trabajos.index') }}" class="{{ request()->routeIs('trabajos.index') ? 'active' : '' }}">Trabajos</a>
+                        @can('admin')
+                            <a href="{{ route('admin.marcas.index') }}" class="{{ request()->routeIs('admin.marcas.*') ? 'active' : '' }}">Marcas Admin</a>
+                            <a href="{{ route('admin.categorias.index') }}" class="{{ request()->routeIs('admin.categorias.*') ? 'active' : '' }}">Categorías Admin</a>
+                            <a href="{{ route('usuarios.index') }}" class="{{ request()->routeIs('usuarios.*') ? 'active' : '' }}">Personal</a>
+                            <a href="{{ route('bitacora.index') }}" class="{{ request()->routeIs('bitacora.*') ? 'active' : '' }}">Bitácora</a>
+                            <a href="{{ route('caja.index') }}" class="{{ request()->routeIs('caja.*') ? 'active' : '' }}">Caja</a>
+                        @endcan
+                    @endif
                 @endunless
 
                 {{-- Info del usuario y logout --}}
@@ -151,7 +169,17 @@
         </div>
     </div>
 
+    @if($showSidebar)
+    <div class="admin-layout-wrapper">
+        <!-- Sidebar: se oculta o muestra basado en sidebarOpen -->
+        <div x-show="sidebarOpen" x-transition.opacity.duration.300ms style="display: none;">
+            <x-admin-sidebar />
+        </div>
+        <!-- Main Content: ajusta el margen dependiendo de si el sidebar está abierto -->
+        <div class="admin-main-content wrap @yield('wrap_class')" :style="sidebarOpen ? 'margin-left: 280px;' : 'margin-left: 0; transition: margin-left 0.3s ease-in-out;'">
+    @else
     <div class="wrap @yield('wrap_class')">
+    @endif
 
         {{-- Mensajes de Retroalimentación Globales --}}
         @if(session('success'))
@@ -187,6 +215,10 @@
 
         @yield('content')
     </div>
+
+    @if($showSidebar ?? false)
+    </div> <!-- Cierre del admin-layout-wrapper -->
+    @endif
 
     @stack('scripts')
     
