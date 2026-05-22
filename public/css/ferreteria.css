@@ -937,8 +937,6 @@ code {
         padding-top: 120px; /* Evitar que el topbar solape el contenido */
     }
 
-<<<<<<< Updated upstream
-=======
     h1 { font-size: 1.6rem; }
     h2 { font-size: 1.2rem; }
     h3 { font-size: 1.05rem; }
@@ -958,7 +956,6 @@ code {
     /* Sidebar de catálogo: ancho amplio en móvil */
     .catalog-sidebar { width: 85vw; }
 
->>>>>>> Stashed changes
     .topbar-links.desktop-only { display: none !important; }
     .hamburger-btn { display: block; }
     
@@ -968,28 +965,16 @@ code {
     }
     
     .action-buttons { width: 100%; }
-<<<<<<< Updated upstream
-    .btn-action, .btn-save, .btn-logout { width: 100%; }
-    
-=======
     .btn-action, .btn-save, .btn-logout { width: 100%; justify-content: center; }
 
     .card, .form-container { padding: 20px; }
     .form-grid { grid-template-columns: 1fr; }
 
->>>>>>> Stashed changes
     .category-header {
         padding: 20px;
         flex-direction: column;
         align-items: flex-start;
     }
-<<<<<<< Updated upstream
-    
-    .product-carousel { padding: 20px; gap: 16px; }
-    .product-card { flex: 0 0 260px; }
-    
-    .stat-grid { grid-template-columns: 1fr; }
-=======
     .category-title { font-size: 1.4rem; }
 
     .product-carousel { padding: 20px; gap: 16px; }
@@ -1198,5 +1183,4 @@ code {
     /* El sidebar siempre es overlay, el contenido no se mueve nunca */
     min-width: 0;
     width: 100%;
->>>>>>> Stashed changes
 }
