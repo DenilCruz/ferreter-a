@@ -46,9 +46,7 @@ class MarcaController extends Controller
             ->with('subcategorias')
             ->get();
 
-        $todasLasMarcas = Marca::where('estado', true)->orderBy('nombre')->get();
-
-        return view('marcas.productos', compact('marca', 'productos', 'categorias', 'orden', 'perPage', 'todasLasMarcas'));
+        return view('marcas.productos', compact('marca', 'productos', 'categorias', 'orden', 'perPage'));
     }
 
     // ── ADMIN ──────────────────────────────────────────────────────────────────

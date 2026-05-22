@@ -1,6 +1,6 @@
 @extends('layouts.ferreteria')
 
-@section('title', $marca->nombre . ' - Ferretería Guisella')
+@section('title', $categoria->nombre . ' - Ferretería Guisella')
 
 @section('content')
 <style>
@@ -60,54 +60,54 @@
 <div style="margin-bottom: 12px; font-size: 0.9rem; color: var(--muted);">
     <a href="{{ url('/') }}" style="color: var(--muted); text-decoration: none;">Inicio</a>
     <span style="margin: 0 6px;">›</span>
-    <a href="{{ route('marcas.index') }}" style="color: var(--muted); text-decoration: none;">Marcas</a>
+    <a href="{{ route('categorias.index') }}" style="color: var(--muted); text-decoration: none;">Categorías</a>
     <span style="margin: 0 6px;">›</span>
-    <span style="color: var(--text-main);">{{ $marca->nombre }}</span>
+    <span style="color: var(--text-main);">{{ $categoria->nombre }}</span>
 </div>
 
 <div class="shop-layout">
 
     {{-- ── PANEL IZQUIERDO ── --}}
     <aside class="shop-aside">
-        <h3 style="margin: 0 0 16px 0; font-size: 1rem; color: var(--text-main);">Categorías</h3>
-        <ul style="list-style: none; padding: 0; margin: 0;">
-            <li style="margin-bottom: 8px;">
-                <a href="{{ route('marcas.productos', $marca->id) }}"
-                   style="color: {{ !request('categoria') ? 'var(--primary)' : 'var(--text-main)' }}; text-decoration: none; font-weight: {{ !request('categoria') ? '700' : '400' }}; font-size: 0.95rem;">
-                    Todas las categorías
-                </a>
-            </li>
-            @foreach($categorias as $cat)
-                <li style="margin-bottom: 4px;">
-                    <a href="{{ route('marcas.productos', [$marca->id, 'categoria' => $cat->idcategoria]) }}"
-                       style="color: {{ request('categoria') == $cat->idcategoria ? 'var(--primary)' : 'var(--text-main)' }}; text-decoration: none; font-weight: {{ request('categoria') == $cat->idcategoria ? '700' : '400' }}; font-size: 0.9rem; display: flex; justify-content: space-between;">
-                        <span>{{ $cat->nombre }}</span>
-                    </a>
-                    @foreach($cat->subcategorias as $sub)
-                        <a href="{{ route('marcas.productos', [$marca->id, 'categoria' => $sub->idcategoria]) }}"
-                           style="display: flex; justify-content: space-between; color: {{ request('categoria') == $sub->idcategoria ? 'var(--primary)' : 'var(--muted)' }}; text-decoration: none; font-size: 0.85rem; padding-left: 14px; margin-top: 3px;">
-                            {{ $sub->nombre }}
+        <h3 style="margin: 0 0 16px 0; font-size: 1rem; color: var(--text-main);">
+            <a href="{{ route('categorias.productos', $categoria->idcategoria) }}"
+               style="text-decoration: none; color: {{ !request('subcategoria') ? 'var(--primary)' : 'var(--text-main)' }}; font-weight: {{ !request('subcategoria') ? '700' : '600' }};">
+                {{ $categoria->nombre }}
+            </a>
+        </h3>
+        @if($subcategorias->isNotEmpty())
+            <ul style="list-style: none; padding: 0; margin: 0;">
+                @foreach($subcategorias as $sub)
+                    <li style="margin-bottom: 6px;">
+                        <a href="{{ route('categorias.productos', [$categoria->idcategoria, 'subcategoria' => $sub->idcategoria]) }}"
+                           style="display: flex; justify-content: space-between; align-items: center; color: {{ request('subcategoria') == $sub->idcategoria ? 'var(--primary)' : 'var(--text-main)' }}; text-decoration: none; font-weight: {{ request('subcategoria') == $sub->idcategoria ? '700' : '400' }}; font-size: 0.9rem; padding: 4px 0;">
+                            <span>{{ $sub->nombre }}</span>
+                            <span style="font-size: 0.8rem; color: var(--muted);">({{ $sub->productos_count }})</span>
                         </a>
-                    @endforeach
-                </li>
-            @endforeach
-        </ul>
+                    </li>
+                @endforeach
+            </ul>
+        @endif
     </aside>
 
     {{-- ── PANEL DERECHO ── --}}
     <div>
         <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 20px;">
-            <h1 style="margin: 0; font-size: 1.8rem;">{{ $marca->nombre }}</h1>
+            <h1 style="margin: 0; font-size: 1.8rem;">{{ $categoria->nombre }}</h1>
             <span style="color: var(--muted); font-size: 0.9rem;">
-                Mostrando {{ $productos->firstItem() }}–{{ $productos->lastItem() }} de {{ $productos->total() }} resultados
+                @if($productos->total() > 0)
+                    Mostrando {{ $productos->firstItem() }}–{{ $productos->lastItem() }} de {{ $productos->total() }} resultados
+                @else
+                    Sin resultados
+                @endif
             </span>
         </div>
 
         {{-- Controles --}}
-        <form method="GET" action="{{ route('marcas.productos', $marca->id) }}"
+        <form method="GET" action="{{ route('categorias.productos', $categoria->idcategoria) }}"
               style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin-bottom: 24px;">
-            @if(request('categoria'))
-                <input type="hidden" name="categoria" value="{{ request('categoria') }}">
+            @if(request('subcategoria'))
+                <input type="hidden" name="subcategoria" value="{{ request('subcategoria') }}">
             @endif
             <select name="orden" onchange="this.form.submit()"
                     style="padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 0.9rem; background: white; cursor: pointer;">
@@ -125,14 +125,14 @@
 
         @if($productos->isEmpty())
             <div style="padding: 60px; text-align: center; color: var(--muted); background: white; border-radius: 16px; border: 1px solid var(--border);">
-                No se encontraron productos para esta selección.
+                No se encontraron productos en esta categoría.
             </div>
         @else
             <div class="shop-product-grid">
                 @foreach($productos as $prod)
                     <div class="product-card">
                         <a href="{{ route('producto.show', $prod->idproducto) }}" style="text-decoration: none; display: block; color: inherit;">
-                            <div class="product-image-placeholder" style="height: 160px; display: flex; align-items: center; justify-content: center; background: var(--bg-light); border-radius: 12px 12px 0 0; overflow: hidden;">
+                            <div style="height: 160px; display: flex; align-items: center; justify-content: center; background: var(--bg-light); border-radius: 12px 12px 0 0; overflow: hidden;">
                                 @if($prod->imagen)
                                     <img src="{{ asset('storage/' . $prod->imagen) }}"
                                          alt="{{ $prod->nombre }}"
@@ -142,8 +142,8 @@
                                 @endif
                             </div>
                         </a>
-                        <div class="product-info" style="padding: 12px;">
-                            <h3 class="product-name" style="font-size: 0.95rem; margin: 0 0 4px 0;">
+                        <div style="padding: 12px;">
+                            <h3 style="font-size: 0.95rem; margin: 0 0 4px 0;">
                                 <a href="{{ route('producto.show', $prod->idproducto) }}" style="text-decoration: none; color: var(--text-main);">
                                     {{ $prod->nombre }}
                                 </a>
@@ -154,9 +154,7 @@
                             @if($prod->marca)
                                 <p style="margin: 0 0 8px 0; font-size: 0.8rem; color: var(--muted);">{{ $prod->marca->nombre }}</p>
                             @endif
-                            <div class="product-footer" style="display: flex; align-items: center; justify-content: space-between;">
-                                <span style="font-weight: 700; color: var(--text-dark);">Bs.{{ number_format($prod->precio, 2) }}</span>
-                            </div>
+                            <span style="font-weight: 700; color: var(--text-dark);">Bs.{{ number_format($prod->precio, 2) }}</span>
                         </div>
                         @if($prod->cantidad > 0)
                             <div style="padding: 0 12px 12px;">
@@ -178,7 +176,6 @@
 
             {{-- Paginación --}}
             <div style="margin-top: 30px; display: flex; justify-content: center; gap: 8px; flex-wrap: wrap;">
-                {{-- Anterior --}}
                 @if($productos->onFirstPage())
                     <span style="padding: 8px 14px; border: 1px solid var(--border); border-radius: 8px; color: var(--muted); font-size: 0.9rem;">←</span>
                 @else
@@ -193,7 +190,6 @@
                     @endif
                 @endforeach
 
-                {{-- Siguiente --}}
                 @if($productos->hasMorePages())
                     <a href="{{ $productos->nextPageUrl() }}" style="padding: 8px 14px; border: 1px solid var(--border); border-radius: 8px; text-decoration: none; color: var(--text-main); font-size: 0.9rem;">→</a>
                 @else

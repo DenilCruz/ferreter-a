@@ -3,14 +3,16 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Producto extends Model
 {
+    use SoftDeletes;
     protected $table = 'producto';
     protected $primaryKey = 'idproducto';
     public $timestamps = false;
     // Esto permite que Laravel inserte datos en estos campos
-    protected $fillable = ['idproducto', 'nombre', 'descripcion', 'precio', 'cantidad', 'id_categoria', 'id_marca', 'fechacaducidad', 'id_color', 'id_medida', 'id_volumen'];
+    protected $fillable = ['idproducto', 'nombre', 'descripcion', 'imagen', 'modelo', 'precio', 'cantidad', 'id_categoria', 'id_marca', 'fechacaducidad', 'id_color', 'id_medida', 'id_volumen'];
 
     public function categoria()
     {
