@@ -216,6 +216,7 @@
 
         @yield('content')
     </div>
+    @endif
 
     {{-- Botón Flotante de Acciones (FAB) para Admin --}}
     @can('admin')
