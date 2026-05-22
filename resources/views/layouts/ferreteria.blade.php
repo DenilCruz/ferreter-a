@@ -9,9 +9,6 @@
     <!-- Alpine.js (para los modales y botones) -->
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
-<<<<<<< Updated upstream
-<body class="fg-body has-topbar">
-=======
 <body class="fg-body has-topbar" x-data="{ mobileMenuOpen: false, sidebarOpen: false, catalogSidebarOpen: false }">
 
     @php
@@ -21,7 +18,6 @@
             $showSidebar = true;
         }
     @endphp
->>>>>>> Stashed changes
 
     {{-- ═══════════════════════════════════════════════════
          TOPBAR UNIFICADA — se muestra en todas las páginas
@@ -38,9 +34,6 @@
         }
     @endphp
 
-<<<<<<< Updated upstream
-    <div class="topbar" x-data="{ mobileMenuOpen: false }">
-=======
     @php
         $categoriasMenu = \App\Models\Categoria::whereNull('id_categoria_padre')->get();
         $marcasMenu = \App\Models\Marca::orderBy('nombre')->get();
@@ -55,7 +48,6 @@
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
                 </button>
             @endif
->>>>>>> Stashed changes
 
             {{-- Logo / Marca --}}
         <div style="display: flex; align-items: center; gap: 16px;">
@@ -63,46 +55,9 @@
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
                 Ferreteria Guisella
             </a>
-<<<<<<< Updated upstream
-
-            @auth
-                {{-- Inventario visible para todos --}}
-                <a href="{{ url('/') }}" class="{{ request()->is('/') ? 'active' : '' }}">Catálogo</a>
-
-                {{-- Solo personal operativo (Admin y Almaceneros) ven Trabajos --}}
-                @unless(Auth::user()->tipoPersona === 'C')
-                    <a href="{{ route('trabajos.index') }}" class="{{ request()->routeIs('trabajos.index') ? 'active' : '' }}">Trabajos</a>
-                    
-                    @can('admin')
-                        <a href="{{ route('usuarios.index') }}" class="{{ request()->routeIs('usuarios.*') ? 'active' : '' }}">Personal</a>
-                        <a href="{{ route('bitacora.index') }}" class="{{ request()->routeIs('bitacora.*') ? 'active' : '' }}">Bitácora</a>
-                    @endcan
-                @endunless
-
-                {{-- Info del usuario y logout --}}
-                <span class="topbar-sep">|</span>
-                <span class="topbar-user">
-                    @can('admin')
-                        <span class="topbar-role-badge">Admin</span>
-                    @endcan
-                    {{ Auth::user()->name }}
-                </span>
-                <a href="{{ route('dashboard') }}">Mi perfil</a>
-                <form method="POST" action="{{ route('logout') }}" class="inline-form">
-                    @csrf
-                    <button type="submit" class="btn-logout">Salir</button>
-                </form>
-            @else
-                {{-- Visitante no autenticado --}}
-                <a href="{{ url('/') }}" class="{{ request()->is('/') ? 'active' : '' }}">Catálogo</a>
-                <a href="{{ route('login') }}">Iniciar sesión</a>
-                <a href="{{ route('register') }}">Registrarse</a>
-            @endauth
-=======
             @can('admin')
                 <span class="topbar-role-badge" style="background: rgba(0, 175, 154, 0.2); color: #00AF9A; padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; border: 1px solid rgba(0, 175, 154, 0.3); white-space: nowrap;">Modo Admin</span>
             @endcan
->>>>>>> Stashed changes
         </div>
 
             {{-- Search Bar --}}
@@ -123,41 +78,6 @@
                     </a>
                 @endauth
 
-<<<<<<< Updated upstream
-            @auth
-                <a href="{{ url('/') }}" class="{{ request()->is('/') ? 'active' : '' }}">Catálogo</a>
-
-                @unless(Auth::user()->tipoPersona === 'C')
-                    <a href="{{ route('trabajos.index') }}" class="{{ request()->routeIs('trabajos.index') ? 'active' : '' }}">Trabajos</a>
-                    
-                    @can('admin')
-                        <a href="{{ route('usuarios.index') }}" class="{{ request()->routeIs('usuarios.*') ? 'active' : '' }}">Personal</a>
-                        <a href="{{ route('bitacora.index') }}" class="{{ request()->routeIs('bitacora.*') ? 'active' : '' }}">Bitácora</a>
-                    @endcan
-                @endunless
-
-                <div class="mobile-menu-user">
-                    <span class="topbar-user" style="font-size: 1rem;">
-                        @can('admin')
-                            <span class="topbar-role-badge">Admin</span>
-                        @endcan
-                        {{ Auth::user()->name }}
-                    </span>
-                    <a href="{{ route('dashboard') }}" style="display: inline-block; padding: 6px 12px; margin: 0;">Mi perfil</a>
-                </div>
-                <form method="POST" action="{{ route('logout') }}" style="margin: 0;">
-                    @csrf
-                    <button type="submit" class="btn-logout">Salir</button>
-                </form>
-            @else
-                <a href="{{ url('/') }}" class="{{ request()->is('/') ? 'active' : '' }}">Catálogo</a>
-                <a href="{{ route('login') }}">Iniciar sesión</a>
-                <a href="{{ route('register') }}">Registrarse</a>
-            @endauth
-        </div>
-    </div>
-
-=======
                 <a href="{{ route('carrito.index') }}" class="action-icon">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
                     @if($cartCount > 0)
@@ -285,7 +205,6 @@
         {{-- El contenido NO se desplaza — el sidebar siempre es overlay --}}
         <div class="admin-main-content wrap @yield('wrap_class')" style="padding: 24px;">
     @else
->>>>>>> Stashed changes
     <div class="wrap @yield('wrap_class')">
 
         {{-- Alerta de acceso denegado (redirigido por AdminMiddleware) --}}
@@ -298,8 +217,6 @@
         @yield('content')
     </div>
 
-<<<<<<< Updated upstream
-=======
     {{-- Botón Flotante de Acciones (FAB) para Admin --}}
     @can('admin')
     <div class="fab-container" x-data="{ fabOpen: false }" style="position: fixed; bottom: 30px; right: 30px; z-index: 1000; display: flex; flex-direction: column; align-items: flex-end; gap: 10px;">
@@ -316,7 +233,6 @@
     </div>
     @endcan
 
->>>>>>> Stashed changes
     @stack('scripts')
     
     <script>
