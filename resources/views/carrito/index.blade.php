@@ -86,10 +86,8 @@
                         <span class="cart-total" style="color: var(--primary);">{{ number_format($total, 2) }} Bs.</span>
                     </div>
 
-                    <form action="{{ route('carrito.checkout') }}" method="POST">
-                        @csrf
-                        <button type="submit" class="btn-save" style="width: 100%; font-size: 1.1rem; padding: 16px;">Proceder al Pago</button>
-                    </form>
+                    <!-- Contenedor del Botón de PayPal -->
+                    <div id="paypal-button-container" style="width: 100%; margin-top: 15px;"></div>
                 </div>
             </div>
         </div>
@@ -102,3 +100,40 @@
         </div>
     @endif
 @endsection
+
+@push('scripts')
+    <!-- REEMPLAZA "TU_CLIENT_ID" CON TU CLIENT ID REAL DE PAYPAL -->
+    <script src="https://www.paypal.com/sdk/js?client-id=ATGzsQEj91F9YM-HUJNNGwvraBLy9yiwK7G4IhgCOtbQQwfZtA4lyL9bff68j3-LbSoR9HHHHwGzHFj9&currency=USD"></script>
+    <script>
+        paypal.Buttons({
+            createOrder: function(data, actions) {
+                // Aquí se configura el monto a cobrar.
+                // Nota: PayPal no soporta Bolivianos (BOB) nativamente, 
+                // debes considerar realizar una conversión a USD en tu controlador o aquí mismo.
+                return actions.order.create({
+                    purchase_units: [{
+                        amount: {
+                            value: '{{ number_format($total, 2, '.', '') }}' // Formato numérico de javascript sin comas
+                        }
+                    }]
+                });
+            },
+            onApprove: function(data, actions) {
+                // Se captura el dinero una vez aprobado por el cliente
+                return actions.order.capture().then(function(details) {
+                    alert('Pago completado con éxito por ' + details.payer.name.given_name);
+                    
+                    // Aquí puedes redirigir a una ruta de éxito, para vaciar el carrito y crear la orden real.
+                    // window.location.href = "/carrito/success";
+                });
+            },
+            onCancel: function(data) {
+                console.log('El pago fue cancelado por el usuario.');
+            },
+            onError: function(err) {
+                console.error('Ocurrió un error en el flujo de PayPal:', err);
+                alert('Ocurrió un problema al procesar el pago con PayPal.');
+            }
+        }).render('#paypal-button-container');
+    </script>
+@endpush
