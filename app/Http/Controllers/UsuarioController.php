@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\DB;
+use App\Models\Cliente;
 use App\Models\Usuario;
 use App\Models\User;
 use App\Models\Bitacora;
@@ -19,7 +20,7 @@ class UsuarioController extends Controller
     {
         Gate::authorize('admin');
         
-        $usuarios = Usuario::all();
+        $usuarios = Usuario::with('cliente')->get();
         $isAdmin = true; // Por la linea anterior siempre será true pero lo mandamos por consistencia
         
         return view('usuarios.index', compact('usuarios', 'isAdmin'));
@@ -32,7 +33,7 @@ class UsuarioController extends Controller
     {
         Gate::authorize('admin');
 
-        $usuario = Usuario::where('ci', $ci)->first();
+        $usuario = Usuario::with('cliente')->where('ci', $ci)->first();
         if ($usuario) {
             // Ejemplo extra para tu "posible estudio", buscar roles asignados (Opcional, pero te lo dejo de extra).
             $asignaciones = \App\Models\EstadoRol::with('rol')->where('ci_empleado', $ci)->get();
@@ -61,9 +62,10 @@ class UsuarioController extends Controller
             'correo' => 'required|email|max:150',
             'domicilio' => 'nullable|string|max:255',
             'tipoPersona' => 'required|string|max:50',
+            'categoria' => 'nullable|string|max:50',
         ]);
 
-        $usuario = Usuario::findOrFail($ci);
+        $usuario = Usuario::with('cliente')->findOrFail($ci);
         $correoAntiguo = $usuario->correo;
         $nombreAntiguo = $usuario->nombre;
 
@@ -90,6 +92,16 @@ class UsuarioController extends Controller
                     'email' => $request->correo,
                     'name' => $request->nombre . ' ' . $request->apellido
                 ]);
+            }
+
+            // 2b. Actualizar la categoría del cliente si corresponde
+            if ($request->tipoPersona === 'C') {
+                Cliente::updateOrCreate(
+                    ['ci' => $usuario->ci],
+                    ['categoria' => $request->categoria]
+                );
+            } elseif ($usuario->cliente) {
+                $usuario->cliente->delete();
             }
 
             // 3. Registrar Accion en Bitacora
