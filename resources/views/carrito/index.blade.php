@@ -103,7 +103,7 @@
 
 @push('scripts')
     <!-- REEMPLAZA "TU_CLIENT_ID" CON TU CLIENT ID REAL DE PAYPAL -->
-    <script src="https://www.paypal.com/sdk/js?client-id=ATGzsQEj91F9YM-HUJNNGwvraBLy9yiwK7G4IhgCOtbQQwfZtA4lyL9bff68j3-LbSoR9HHHHwGzHFj9&currency=USD"></script>
+    <script src="https://www.paypal.com/sdk/js?client-id=AWFYLbs58oG5koShB24kAfaxs2JFcJgfpwb5D1JZryiQJQwYE6543FFS7ms3mjRtxQnfiv4Xcs-G5MDn&currency=USD"></script>
     <script>
         paypal.Buttons({
             createOrder: function(data, actions) {
@@ -124,7 +124,7 @@
                     alert('Pago completado con éxito por ' + details.payer.name.given_name);
                     
                     // Aquí puedes redirigir a una ruta de éxito, para vaciar el carrito y crear la orden real.
-                    // window.location.href = "/carrito/success";
+                    //window.location.href = "/carrito/success";
                 });
             },
             onCancel: function(data) {
