@@ -18,12 +18,12 @@ class CajaController extends Controller
         foreach ($cajas as $caja) {
             if ($caja->estado === 'abierta') {
                 try {
-                    $ventas = DB::table('ventas')
-                                ->where('user_id', $caja->user_id)
-                                ->where('created_at', '>=', $caja->fecha_apertura)
+                    $ventas = DB::table('facturaventa')
+                                ->where('ci_empleado', $caja->user_id)
+                                ->where('fecha', '>=', $caja->fecha_apertura)
                                 ->sum('total');
                 } catch (\Exception $e) {
-                    $ventas = 0; // Fallback si la tabla ventas no existe aún
+                    $ventas = 0;
                 }
                 $caja->saldo_esperado = $caja->monto_apertura + $ventas;
                 $caja->ventas_total = $ventas;
@@ -60,9 +60,9 @@ class CajaController extends Controller
         }
 
         try {
-            $ventas = DB::table('ventas')
-                        ->where('user_id', $caja->user_id)
-                        ->where('created_at', '>=', $caja->fecha_apertura)
+            $ventas = DB::table('facturaventa')
+                        ->where('ci_empleado', $caja->user_id)
+                        ->where('fecha', '>=', $caja->fecha_apertura)
                         ->sum('total');
         } catch (\Exception $e) {
             $ventas = 0;
@@ -84,10 +84,10 @@ class CajaController extends Controller
     public function reporte(Caja $caja)
     {
         try {
-            $ventas = DB::table('ventas')
-                        ->where('user_id', $caja->user_id)
-                        ->where('created_at', '>=', $caja->fecha_apertura)
-                        ->where('created_at', '<=', $caja->fecha_cierre ?? Carbon::now())
+            $ventas = DB::table('facturaventa')
+                        ->where('ci_empleado', $caja->user_id)
+                        ->where('fecha', '>=', $caja->fecha_apertura)
+                        ->where('fecha', '<=', $caja->fecha_cierre ?? Carbon::now())
                         ->sum('total');
         } catch (\Exception $e) {
             $ventas = 0;

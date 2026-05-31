@@ -68,6 +68,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Trabajos y asignaciones (cualquier empleado autenticado, la vista filtra por rol)
     Route::get('/trabajos', [TrabajoController::class, 'index'])->name('trabajos.index');
 
+    // Ventas en tienda (POS) para cajeros y secretarias
+    Route::get('/ventas', [\App\Http\Controllers\VentaController::class, 'index'])->name('ventas.index');
+    Route::get('/ventas/crear', [\App\Http\Controllers\VentaController::class, 'create'])->name('ventas.create');
+    Route::post('/ventas', [\App\Http\Controllers\VentaController::class, 'store'])->name('ventas.store');
+    Route::get('/api/clientes/buscar/{ci}', [\App\Http\Controllers\VentaController::class, 'buscarCliente']);
+    Route::post('/api/clientes/rapido', [\App\Http\Controllers\VentaController::class, 'registrarCliente'])->name('clientes.rapido');
+    Route::get('/ventas/comprobante/{nro}', [\App\Http\Controllers\VentaController::class, 'imprimir'])->name('ventas.comprobante');
+
+
     // ─────────────────────────────────────────────────────
     // SOLO ADMIN — requieren login + ser administrador
     // ─────────────────────────────────────────────────────

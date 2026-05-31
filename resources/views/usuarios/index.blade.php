@@ -47,6 +47,7 @@
             <h4 style="margin: 0 0 12px 0; color:var(--primary);">Ficha Personal: <span id="study-name"></span></h4>
             <p style="margin: 8px 0; font-size: 0.95rem;"><strong>Correo Contacto:</strong> <span id="study-mail"></span></p>
             <p style="margin: 8px 0; font-size: 0.95rem;"><strong>Tipo Perfil:</strong> <span id="study-tipo"></span></p>
+            <p style="margin: 8px 0; font-size: 0.95rem;"><strong>Categoría Cliente:</strong> <span id="study-categoria"></span></p>
 
             <h4 style="margin: 20px 0 12px 0; color:var(--text-main);">Historial de Roles / Asignaciones Activas:</h4>
             <ul class="task-list" id="study-tasks">
@@ -83,6 +84,7 @@
                 </div>
                 <div class="field"><label>Correo Electrónico (Auth)</label><input type="email" id="modcorreo" name="correo" required></div>
                 <div class="field"><label>Domicilio</label><input type="text" id="moddomicilio" name="domicilio"></div>
+                <div class="field"><label>Categoría Cliente</label><input type="text" id="modcategoria" name="categoria" placeholder="Ej: Hogar, Construcción"></div>
                 <div class="field"><label>Tipo de Persona</label><input type="text" id="modtipo" name="tipoPersona" required></div>
             </div>
             <div style="margin-top: 24px; text-align: right;">
@@ -130,11 +132,12 @@
                             <th>Teléfono</th>
                             <th>Correo Sincronizado</th>
                             <th>Rol Social</th>
+                            <th>Categoría Cliente</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach($usuarios as $u)
-                        <tr>
+                                <tr>
                             <td><span class="badge">{{ $u->ci }}</span></td>
                             <td><strong>{{ $u->nombre }} {{ $u->apellido }}</strong></td>
                             <td class="muted">{{ $u->telefono ?? 'S/R' }}</td>
@@ -146,6 +149,7 @@
                                     <span class="badge">{{ $u->tipoPersona }}</span>
                                 @endif
                             </td>
+                            <td class="muted">{{ $u->cliente->categoria ?? ($u->tipoPersona === 'C' ? 'Sin categoría' : 'N/A') }}</td>
                         </tr>
                         @endforeach
                     </tbody>

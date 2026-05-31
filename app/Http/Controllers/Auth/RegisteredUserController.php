@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\Cliente;
 use App\Models\Usuario;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
@@ -47,6 +48,12 @@ class RegisteredUserController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'tipoPersona' => 'C', // Usamos 'C' para Clientes según tu estándar
+        ]);
+
+        Cliente::firstOrCreate([
+            'ci' => $user->ci,
+        ], [
+            'categoria' => null
         ]);
 
         event(new Registered($user));
