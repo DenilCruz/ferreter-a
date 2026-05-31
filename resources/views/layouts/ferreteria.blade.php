@@ -69,11 +69,17 @@
             {{-- Acciones (Usuario, Carrito) --}}
             <div class="topbar-actions">
                 @auth
-                    <a href="{{ route('dashboard') }}" class="action-icon">
+                    <a href="{{ route('dashboard') }}" class="action-icon" title="Mi Cuenta">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
                     </a>
+                    <form method="POST" action="{{ route('logout') }}" style="display: inline; margin: 0; padding: 0;">
+                        @csrf
+                        <button type="submit" class="action-icon" style="background: none; border: none; cursor: pointer; padding: 8px;" title="Cerrar Sesión">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                        </button>
+                    </form>
                 @else
-                    <a href="{{ route('login') }}" class="action-icon">
+                    <a href="{{ route('login') }}" class="action-icon" title="Iniciar Sesión">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
                     </a>
                 @endauth
@@ -196,7 +202,6 @@
              style="display: none;">
             <x-admin-sidebar />
         </div>
-        {{-- Overlay oscuro en m\u00f3vil para cerrar el sidebar al tocar fuera --}}
         {{-- Overlay oscuro para cerrar el sidebar al tocar/clicar fuera --}}
         <div x-show="sidebarOpen"
              @click="sidebarOpen = false"
@@ -205,7 +210,8 @@
         {{-- El contenido NO se desplaza — el sidebar siempre es overlay --}}
         <div class="admin-main-content wrap @yield('wrap_class')" style="padding: 24px;">
     @else
-    <div class="wrap @yield('wrap_class')">
+        <div class="wrap @yield('wrap_class')">
+    @endif
 
         {{-- Alerta de acceso denegado (redirigido por AdminMiddleware) --}}
         @if(session('error_acceso'))
@@ -216,7 +222,6 @@
 
         @yield('content')
     </div>
-    @endif
 
     {{-- Botón Flotante de Acciones (FAB) para Admin --}}
     @can('admin')
