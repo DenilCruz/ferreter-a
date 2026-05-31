@@ -9,7 +9,7 @@
     <!-- Alpine.js (para los modales y botones) -->
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
-<body class="fg-body has-topbar" x-data="{ mobileMenuOpen: false, sidebarOpen: false }">
+<body class="fg-body has-topbar" x-data="{ mobileMenuOpen: false, sidebarOpen: false, catalogSidebarOpen: false }">
 
     @php
         $showSidebar = false;
@@ -34,177 +34,184 @@
         }
     @endphp
 
-    <div class="topbar" :style="sidebarOpen ? 'left: 280px; transition: left 0.3s ease-in-out;' : 'left: 0; transition: left 0.3s ease-in-out;'">
+    @php
+        $categoriasMenu = \App\Models\Categoria::whereNull('id_categoria_padre')->get();
+        $marcasMenu = \App\Models\Marca::orderBy('nombre')->get();
+    @endphp
 
-        {{-- Botón Toggle para Sidebar si es admin (Esquina superior izquierda) --}}
-        @if($showSidebar)
-            <button @click="sidebarOpen = !sidebarOpen" style="background: none; border: none; cursor: pointer; display: flex; align-items: center; color: var(--primary); padding: 8px; margin-right: 8px;" aria-label="Menú Lateral">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-            </button>
-        @endif
+    <div class="topbar-wrapper">
+        <!-- TOPBAR MAIN -->
+        <div class="topbar-main">
+            {{-- Botón Toggle para Sidebar admin (Solo si es admin) --}}
+            @if($showSidebar)
+                <button @click="sidebarOpen = !sidebarOpen" style="background: none; border: none; cursor: pointer; color: white; padding: 8px;" aria-label="Menú Admin">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                </button>
+            @endif
 
-        {{-- Logo / Marca --}}
-        <a href="{{ url('/') }}" class="topbar-brand">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
-            Ferretería Guisella
-        </a>
-
-        {{-- Botón Menú Móvil (Hamburguesa) --}}
-        <button class="hamburger-btn" @click="mobileMenuOpen = !mobileMenuOpen" aria-label="Menú">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="3" y1="12" x2="21" y2="12"></line>
-                <line x1="3" y1="6" x2="21" y2="6"></line>
-                <line x1="3" y1="18" x2="21" y2="18"></line>
-            </svg>
-        </button>
-
-        {{-- Enlaces Escritorio --}}
-        <div class="topbar-links desktop-only">
-            <a href="{{ route('carrito.index') }}" class="cart-link" style="display: flex; align-items: center; gap: 6px;">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
-                Carrito
-                @if($cartCount > 0)
-                    <span class="cart-count-badge" style="background: var(--primary); color: white; border-radius: 10px; padding: 2px 6px; font-size: 0.7rem; font-weight: bold;">{{ $cartCount }}</span>
-                @else
-                    <span class="cart-count-badge" style="background: var(--primary); color: white; border-radius: 10px; padding: 2px 6px; font-size: 0.7rem; font-weight: bold; display: none;">0</span>
-                @endif
+            {{-- Logo / Marca --}}
+        <div style="display: flex; align-items: center; gap: 16px;">
+            <a href="{{ url('/') }}" class="topbar-brand">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+                Ferreteria Guisella
             </a>
-
-            @auth
-                @if(!$showSidebar)
-                    {{-- Inventario visible para todos (no admin) --}}
-                    <a href="{{ url('/') }}" class="{{ request()->is('/') ? 'active' : '' }}">Catálogo</a>
-                    <a href="{{ route('marcas.index') }}" class="{{ request()->routeIs('marcas.*') ? 'active' : '' }}">Marcas</a>
-                    <a href="{{ route('categorias.index') }}" class="{{ request()->routeIs('categorias.*') ? 'active' : '' }}">Categorías</a>
-                @endif
-
-                {{-- Solo personal operativo (Admin y Almaceneros) ven Trabajos --}}
-                @unless(Auth::user()->tipoPersona === 'C')
-                    @if(!$showSidebar)
-                        <a href="{{ route('trabajos.index') }}" class="{{ request()->routeIs('trabajos.index') ? 'active' : '' }}">Trabajos</a>
-                        @can('admin')
-                            <a href="{{ route('admin.marcas.index') }}" class="{{ request()->routeIs('admin.marcas.*') ? 'active' : '' }}">Marcas Admin</a>
-                            <a href="{{ route('admin.categorias.index') }}" class="{{ request()->routeIs('admin.categorias.*') ? 'active' : '' }}">Categorías Admin</a>
-                            <a href="{{ route('usuarios.index') }}" class="{{ request()->routeIs('usuarios.*') ? 'active' : '' }}">Personal</a>
-                            <a href="{{ route('bitacora.index') }}" class="{{ request()->routeIs('bitacora.*') ? 'active' : '' }}">Bitácora</a>
-                            <a href="{{ route('caja.index') }}" class="{{ request()->routeIs('caja.*') ? 'active' : '' }}">Caja</a>
-                        @endcan
-                    @endif
-                @endunless
-
-                {{-- Info del usuario y logout --}}
-                <span class="topbar-sep">|</span>
-                <span class="topbar-user">
-                    @can('admin')
-                        <span class="topbar-role-badge">Admin</span>
-                    @endcan
-                    {{ Auth::user()->name }}
-                </span>
-                <a href="{{ route('dashboard') }}">Mi perfil</a>
-                <form method="POST" action="{{ route('logout') }}" class="inline-form">
-                    @csrf
-                    <button type="submit" class="btn-logout">Salir</button>
-                </form>
-            @else
-                {{-- Visitante no autenticado --}}
-                <a href="{{ url('/') }}" class="{{ request()->is('/') ? 'active' : '' }}">Catálogo</a>
-                <a href="{{ route('marcas.index') }}" class="{{ request()->routeIs('marcas.*') ? 'active' : '' }}">Marcas</a>
-                <a href="{{ route('categorias.index') }}" class="{{ request()->routeIs('categorias.*') ? 'active' : '' }}">Categorías</a>
-                <a href="{{ route('login') }}">Iniciar sesión</a>
-                <a href="{{ route('register') }}">Registrarse</a>
-            @endauth
+            @can('admin')
+                <span class="topbar-role-badge" style="background: rgba(0, 175, 154, 0.2); color: #00AF9A; padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; border: 1px solid rgba(0, 175, 154, 0.3); white-space: nowrap;">Modo Admin</span>
+            @endcan
         </div>
 
-        {{-- Menú Móvil Desplegable --}}
-        <div class="mobile-menu" :class="{ 'is-open': mobileMenuOpen }" style="display: none;" x-show="mobileMenuOpen" x-transition.opacity>
-            <a href="{{ route('carrito.index') }}" class="cart-link" style="display: flex; align-items: center; justify-content: space-between;">
-                <span style="display: flex; align-items: center; gap: 8px;">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
-                    Carrito
-                </span>
-                @if($cartCount > 0)
-                    <span class="cart-count-badge" style="background: var(--primary); color: white; border-radius: 10px; padding: 2px 8px; font-size: 0.8rem; font-weight: bold;">{{ $cartCount }}</span>
+            {{-- Search Bar --}}
+            <div class="search-container">
+                <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <input type="text" class="search-input" placeholder="¿Qué estás buscando?">
+            </div>
+
+            {{-- Acciones (Usuario, Carrito) --}}
+            <div class="topbar-actions">
+                @auth
+                    <a href="{{ route('dashboard') }}" class="action-icon" title="Mi Cuenta">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                    </a>
+                    <form method="POST" action="{{ route('logout') }}" style="display: inline; margin: 0; padding: 0;">
+                        @csrf
+                        <button type="submit" class="action-icon" style="background: none; border: none; cursor: pointer; padding: 8px;" title="Cerrar Sesión">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                        </button>
+                    </form>
                 @else
-                    <span class="cart-count-badge" style="background: var(--primary); color: white; border-radius: 10px; padding: 2px 8px; font-size: 0.8rem; font-weight: bold; display: none;">0</span>
-                @endif
-            </a>
+                    <a href="{{ route('login') }}" class="action-icon" title="Iniciar Sesión">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                    </a>
+                @endauth
 
-            @auth
-                <a href="{{ url('/') }}" class="{{ request()->is('/') ? 'active' : '' }}">Catálogo</a>
-                <a href="{{ route('marcas.index') }}" class="{{ request()->routeIs('marcas.*') ? 'active' : '' }}">Marcas</a>
-                <a href="{{ route('categorias.index') }}" class="{{ request()->routeIs('categorias.*') ? 'active' : '' }}">Categorías</a>
+                <a href="{{ route('carrito.index') }}" class="action-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+                    @if($cartCount > 0)
+                        <span class="cart-badge">{{ $cartCount }}</span>
+                    @endif
+                </a>
+            </div>
+        </div>
 
-                @unless(Auth::user()->tipoPersona === 'C')
-                    <a href="{{ route('trabajos.index') }}" class="{{ request()->routeIs('trabajos.index') ? 'active' : '' }}">Trabajos</a>
-
-                    @can('admin')
-                        <a href="{{ route('admin.marcas.index') }}" class="{{ request()->routeIs('admin.marcas.*') ? 'active' : '' }}">Marcas Admin</a>
-                        <a href="{{ route('admin.categorias.index') }}" class="{{ request()->routeIs('admin.categorias.*') ? 'active' : '' }}">Categorías Admin</a>
-                        <a href="{{ route('usuarios.index') }}" class="{{ request()->routeIs('usuarios.*') ? 'active' : '' }}">Personal</a>
-                        <a href="{{ route('bitacora.index') }}" class="{{ request()->routeIs('bitacora.*') ? 'active' : '' }}">Bitácora</a>
-                        <a href="{{ route('caja.index') }}" class="{{ request()->routeIs('caja.*') ? 'active' : '' }}">Caja</a>
-                    @endcan
-                @endunless
-
-                <div class="mobile-menu-user">
-                    <span class="topbar-user" style="font-size: 1rem;">
-                        @can('admin')
-                            <span class="topbar-role-badge">Admin</span>
-                        @endcan
-                        {{ Auth::user()->name }}
-                    </span>
-                    <a href="{{ route('dashboard') }}" style="display: inline-block; padding: 6px 12px; margin: 0;">Mi perfil</a>
-                </div>
-                <form method="POST" action="{{ route('logout') }}" style="margin: 0;">
-                    @csrf
-                    <button type="submit" class="btn-logout">Salir</button>
-                </form>
-            @else
-                <a href="{{ url('/') }}" class="{{ request()->is('/') ? 'active' : '' }}">Catálogo</a>
-                <a href="{{ route('marcas.index') }}" class="{{ request()->routeIs('marcas.*') ? 'active' : '' }}">Marcas</a>
-                <a href="{{ route('categorias.index') }}" class="{{ request()->routeIs('categorias.*') ? 'active' : '' }}">Categorías</a>
-                <a href="{{ route('login') }}">Iniciar sesión</a>
-                <a href="{{ route('register') }}">Registrarse</a>
-            @endauth
+        <!-- TOPBAR SECONDARY -->
+        <div class="topbar-secondary">
+            @cannot('admin')
+            {{-- El botón "Productos" solo se muestra a usuarios no administradores --}}
+            <button class="btn-productos" @click="catalogSidebarOpen = !catalogSidebarOpen">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                Productos
+            </button>
+            @endcannot
+        </div>
         </div>
     </div>
 
+    {{-- El sidebar de catálogo solo es visible para usuarios NO administradores --}}
+    @cannot('admin')
+    <!-- MEGA-MENU / CATALOG SIDEBAR -->
+    <div class="catalog-sidebar-overlay" x-show="catalogSidebarOpen" @click="catalogSidebarOpen = false" style="display: none;" x-transition.opacity></div>
+    <div class="catalog-sidebar" :class="{ 'open': catalogSidebarOpen }">
+        <div class="catalog-sidebar-header">
+            <h3>{{ Auth::check() && Auth::user()->can('admin') ? 'Gestión de Productos' : 'Catálogo' }}</h3>
+            <button @click="catalogSidebarOpen = false" style="background: none; border: none; cursor: pointer; color: var(--text-muted);">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+        </div>
+        <ul class="catalog-menu">
+            @if(Auth::check() && Auth::user()->can('admin'))
+                <!-- Opciones de Gestión para Admin -->
+                <li>
+                    <a href="{{ route('productos.create') }}">
+                        <span class="catalog-menu-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+                        </span>
+                        Añadir Producto
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('admin.categorias.index') }}">
+                        <span class="catalog-menu-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+                        </span>
+                        Categorías
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('admin.marcas.index') }}">
+                        <span class="catalog-menu-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+                        </span>
+                        Marcas
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('dashboard') }}">
+                        <span class="catalog-menu-icon" style="color: var(--danger);">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+                        </span>
+                        Stock Bajo / Crítico
+                    </a>
+                </li>
+            @else
+                <!-- Lista Pública de Categorías -->
+                @foreach($categoriasMenu as $cat)
+                <li>
+                    <a href="{{ route('categorias.productos', $cat->idcategoria) }}">
+                        <span class="catalog-menu-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+                        </span>
+                        {{ $cat->nombre }}
+                        <span class="catalog-menu-arrow">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                        </span>
+                    </a>
+                </li>
+                @endforeach
+
+                {{-- Sección de Marcas --}}
+                <li style="padding: 12px 24px 6px; font-size: 0.75rem; font-weight: 800; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.05em; list-style: none; margin-top: 4px; border-top: 1px solid var(--border);">
+                    Marcas
+                </li>
+                @foreach($marcasMenu as $marca)
+                <li>
+                    <a href="{{ route('marcas.productos', $marca->id) }}">
+                        <span class="catalog-menu-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+                        </span>
+                        {{ $marca->nombre }}
+                        <span class="catalog-menu-arrow">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                        </span>
+                    </a>
+                </li>
+                @endforeach
+            @endif
+        </ul>
+    </div>
+    @endcannot
+
     @if($showSidebar)
-    <div class="admin-layout-wrapper">
-        <!-- Sidebar: se oculta o muestra basado en sidebarOpen -->
-        <div x-show="sidebarOpen" x-transition.opacity.duration.300ms style="display: none;">
+        {{-- Sidebar fijo que empieza debajo del topbar --}}
+        <div x-show="sidebarOpen"
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="-translate-x-full"
+             x-transition:enter-end="translate-x-0"
+             x-transition:leave="transition ease-in duration-200"
+             x-transition:leave-start="translate-x-0"
+             x-transition:leave-end="-translate-x-full"
+             style="display: none;">
             <x-admin-sidebar />
         </div>
-        <!-- Main Content: ajusta el margen dependiendo de si el sidebar está abierto -->
-        <div class="admin-main-content wrap @yield('wrap_class')" :style="sidebarOpen ? 'margin-left: 280px;' : 'margin-left: 0; transition: margin-left 0.3s ease-in-out;'">
+        {{-- Overlay oscuro para cerrar el sidebar al tocar/clicar fuera --}}
+        <div x-show="sidebarOpen"
+             @click="sidebarOpen = false"
+             style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 949;"
+             x-transition.opacity></div>
+        {{-- El contenido NO se desplaza — el sidebar siempre es overlay --}}
+        <div class="admin-main-content wrap @yield('wrap_class')" style="padding: 24px;">
     @else
-    <div class="wrap @yield('wrap_class')">
+        <div class="wrap @yield('wrap_class')">
     @endif
-
-        {{-- Mensajes de Retroalimentación Globales --}}
-        @if(session('success'))
-            <div class="alert alert-success animate-fade-up" style="margin-bottom: 20px;">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-                {{ session('success') }}
-            </div>
-        @endif
-
-        @if(session('error'))
-            <div class="alert alert-error animate-fade-up" style="margin-bottom: 20px;">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-                {{ session('error') }}
-            </div>
-        @endif
-
-        @if($errors->any())
-            <div class="alert alert-error animate-fade-up" style="margin-bottom: 20px;">
-                <ul style="margin: 0; padding-left: 20px;">
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
 
         {{-- Alerta de acceso denegado (redirigido por AdminMiddleware) --}}
         @if(session('error_acceso'))
@@ -216,9 +223,21 @@
         @yield('content')
     </div>
 
-    @if($showSidebar ?? false)
-    </div> <!-- Cierre del admin-layout-wrapper -->
-    @endif
+    {{-- Botón Flotante de Acciones (FAB) para Admin --}}
+    @can('admin')
+    <div class="fab-container" x-data="{ fabOpen: false }" style="position: fixed; bottom: 30px; right: 30px; z-index: 1000; display: flex; flex-direction: column; align-items: flex-end; gap: 10px;">
+        <div class="fab-menu" x-show="fabOpen" x-transition.opacity style="display: none; display: flex; flex-direction: column; gap: 8px;">
+            <a href="{{ route('productos.create') }}" style="background: white; color: #00AF9A; padding: 10px 16px; border-radius: 20px; font-weight: 700; font-size: 0.9rem; text-decoration: none; box-shadow: 0 4px 10px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 8px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+                Nuevo Producto
+            </a>
+            <!-- Puedes añadir más opciones al FAB aquí -->
+        </div>
+        <button @click="fabOpen = !fabOpen" style="background: #00AF9A; color: white; width: 56px; height: 56px; border-radius: 50%; border: none; cursor: pointer; box-shadow: 0 4px 15px rgba(0, 175, 154, 0.4); display: flex; align-items: center; justify-content: center; transition: transform 0.2s;" :style="fabOpen ? 'transform: rotate(45deg);' : ''">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        </button>
+    </div>
+    @endcan
 
     @stack('scripts')
     

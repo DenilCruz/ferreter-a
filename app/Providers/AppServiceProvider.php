@@ -33,8 +33,7 @@ class AppServiceProvider extends ServiceProvider
                     ->where('estado', 'Activo')
                     ->exists();
             }
-            // Caso especial para el admin de correo hardcodeado
-            return in_array($user->email, ['admi@gmail.com']);
+            return false;
         });
 
         // 2. Rol ALMACENERO (Gestión de Stock/Productos)

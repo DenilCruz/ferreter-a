@@ -86,10 +86,17 @@
                         <span class="cart-total" style="color: var(--primary);">{{ number_format($total, 2) }} Bs.</span>
                     </div>
 
-                    <form action="{{ route('carrito.checkout') }}" method="POST">
+                    <!-- Formulario oculto que se enviará cuando PayPal apruebe el pago -->
+                    <form id="form-checkout-backend" action="{{ route('carrito.checkout') }}" method="POST" style="display: none;">
                         @csrf
-                        <button type="submit" class="btn-save" style="width: 100%; font-size: 1.1rem; padding: 16px;">Proceder al Pago</button>
                     </form>
+
+                    <!-- Contenedor del Botón de PayPal -->
+                    @auth
+                        <div id="paypal-button-container" style="width: 100%; margin-top: 15px;"></div>
+                    @else
+                        <a href="{{ route('login') }}" class="btn-save" style="display: block; text-align: center; width: 100%; margin-top: 15px; font-size: 1.1rem; padding: 16px; text-decoration: none;">Iniciar Sesión para Pagar</a>
+                    @endauth
                 </div>
             </div>
         </div>
@@ -102,3 +109,43 @@
         </div>
     @endif
 @endsection
+
+@push('scripts')
+    @auth
+        @if(count($cartItems) > 0)
+        <!-- REEMPLAZA "TU_CLIENT_ID" CON TU CLIENT ID REAL DE PAYPAL -->
+        <script src="https://www.paypal.com/sdk/js?client-id=AcTh8eDtd5QLzTGJ3gSyjsHAc3i0nwldJcTy3l4_1KggToYfdJvIl01rgVwXu6CjcSeRsEc1RMAHjYvW&currency=USD"></script>
+        <script>
+            paypal.Buttons({
+                createOrder: function(data, actions) {
+                    // Aquí se configura el monto a cobrar.
+                    // Nota: PayPal no soporta Bolivianos (BOB) nativamente, 
+                    // si necesitas usar BOB, asegúrate de convertir el total a USD aquí.
+                    return actions.order.create({
+                        purchase_units: [{
+                            amount: {
+                                value: '{{ number_format($total, 2, '.', '') }}' // Formato numérico de javascript sin comas
+                            }
+                        }]
+                    });
+                },
+                onApprove: function(data, actions) {
+                    // Se captura el dinero una vez aprobado por el cliente
+                    return actions.order.capture().then(function(details) {
+                        // Una vez que PayPal cobra el dinero con éxito, 
+                        // enviamos el formulario original al backend para descontar inventario y vaciar carrito.
+                        document.getElementById('form-checkout-backend').submit();
+                    });
+                },
+                onCancel: function(data) {
+                    console.log('El pago fue cancelado por el usuario.');
+                },
+                onError: function(err) {
+                    console.error('Ocurrió un error en el flujo de PayPal:', err);
+                    alert('Ocurrió un problema al procesar el pago con PayPal.');
+                }
+            }).render('#paypal-button-container');
+        </script>
+        @endif
+    @endauth
+@endpush
