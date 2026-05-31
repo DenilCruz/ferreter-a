@@ -226,7 +226,7 @@ class VentaController extends Controller
             }
 
             // 5. Registrar en bitácora
-            Bitacora::registrar('INSERTAR', 'facturaventa', $nroFactura, "Venta física registrada en tienda por total de " . number_format($totalFactura, 2) . " BOB. Cliente CI: {$request->ci_cliente}");
+            Bitacora::registrar('INSERTAR', 'notaventa', $nroFactura, "Venta física registrada en tienda por total de " . number_format($totalFactura, 2) . " BOB. Cliente CI: {$request->ci_cliente}");
 
             DB::commit();
 

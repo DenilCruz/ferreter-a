@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class DetalleFacturaVenta extends Model
 {
-    protected $table = 'detallefacturaventa';
+    protected $table = 'detallenotaventa';
     
     // Al ser una tabla de detalles con clave compuesta, deshabilitamos la clave primaria por defecto
     protected $primaryKey = null;

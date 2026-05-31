@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class FacturaVenta extends Model
 {
-    protected $table = 'facturaventa';
+    protected $table = 'notaventa';
     protected $primaryKey = 'nro';
     public $incrementing = false;
     protected $keyType = 'int';

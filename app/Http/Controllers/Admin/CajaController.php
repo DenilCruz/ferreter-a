@@ -18,7 +18,7 @@ class CajaController extends Controller
         foreach ($cajas as $caja) {
             if ($caja->estado === 'abierta') {
                 try {
-                    $ventas = DB::table('facturaventa')
+                    $ventas = DB::table('notaventa')
                                 ->where('ci_empleado', $caja->user_id)
                                 ->where('fecha', '>=', $caja->fecha_apertura)
                                 ->sum('total');
@@ -60,7 +60,7 @@ class CajaController extends Controller
         }
 
         try {
-            $ventas = DB::table('facturaventa')
+            $ventas = DB::table('notaventa')
                         ->where('ci_empleado', $caja->user_id)
                         ->where('fecha', '>=', $caja->fecha_apertura)
                         ->sum('total');
@@ -84,7 +84,7 @@ class CajaController extends Controller
     public function reporte(Caja $caja)
     {
         try {
-            $ventas = DB::table('facturaventa')
+            $ventas = DB::table('notaventa')
                         ->where('ci_empleado', $caja->user_id)
                         ->where('fecha', '>=', $caja->fecha_apertura)
                         ->where('fecha', '<=', $caja->fecha_cierre ?? Carbon::now())
