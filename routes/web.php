@@ -103,7 +103,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/api/usuario/{ci}', [UsuarioController::class, 'getUsuario']);
         Route::resource('usuarios', UsuarioController::class);
 
-        // Gestión de Proveedores
+        // caso de uso Gestión de Proveedores
         Route::resource('proveedores', \App\Http\Controllers\Admin\ProveedorController::class)->names('admin.proveedores');
 
         // Gestión de Compras (CU14)

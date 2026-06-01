@@ -1,7 +1,7 @@
 @extends('layouts.ferreteria')
 
 @section('title', 'Gestionar Proveedores - Ferretería Guisella')
-
+<!--vista para el caso de uso gettionar proveedores c3 - ferreteria ciclo 3 - si1-->
 @section('content')
 <div x-data="proveedorApp()" class="animate-fade-up" style="display: flex; flex-direction: column; gap: 24px;">
     
@@ -17,7 +17,7 @@
         </button>
     </div>
 
-    <!-- MENSAJES DE ÉXITO O ERROR -->
+    <!-- MENSAJES DE ÉXIT O O ERROR -->
     @if (session('success'))
         <div class="alert alert-success" style="margin: 0;">
             {{ session('success') }}

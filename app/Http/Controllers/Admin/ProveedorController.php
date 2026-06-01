@@ -7,9 +7,9 @@ use App\Models\Proveedor;
 use App\Models\Bitacora;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-
+//controlador del caso de uso gestionar proveedor c3 - ferreteria ciclo 3 - si1
 class ProveedorController extends Controller
-{
+{       
     /**
      * Listado interactivo de proveedores y sus compras
      */

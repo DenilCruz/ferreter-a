@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-
+//modelo comunicador de la bse de datos al sistema del caso de uso gestionar proveedor c3 - ferreteria ciclo 3 - si1
 class Proveedor extends Model
 {
     protected $table = 'proveedor';
