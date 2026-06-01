@@ -94,6 +94,12 @@
                     <!-- Contenedor del Botón de PayPal -->
                     @auth
                         <div id="paypal-button-container" style="width: 100%; margin-top: 15px;"></div>
+                        
+                        <!-- Botón de Generar Cotización -->
+                        <a href="{{ route('cotizacion.generar') }}" target="_blank" style="display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; margin-top: 15px; background: white; color: #1F2937; border: 2px solid #E5E7EB; padding: 14px; border-radius: 12px; font-weight: 700; font-size: 1.05rem; text-decoration: none; transition: all 0.2s;" onmouseover="this.style.borderColor='#00AF9A'; this.style.color='#00AF9A';" onmouseout="this.style.borderColor='#E5E7EB'; this.style.color='#1F2937';">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                            Generar Cotización (PDF)
+                        </a>
                     @else
                         <a href="{{ route('login') }}" class="btn-save" style="display: block; text-align: center; width: 100%; margin-top: 15px; font-size: 1.1rem; padding: 16px; text-decoration: none;">Iniciar Sesión para Pagar</a>
                     @endauth

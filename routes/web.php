@@ -26,6 +26,7 @@ Route::get('/categorias/{id}/productos', [CategoriaController::class, 'productos
 Route::get('/carrito', [CartController::class, 'index'])->name('carrito.index');
 Route::post('/carrito/add', [CartController::class, 'add'])->name('carrito.add');
 Route::post('/carrito/update', [CartController::class, 'update'])->name('carrito.update');
+Route::get('/carrito/cotizacion', [CartController::class, 'generarCotizacion'])->name('cotizacion.generar');
 Route::post('/carrito/remove', [CartController::class, 'remove'])->name('carrito.remove');
 Route::post('/carrito/clear', [CartController::class, 'clear'])->name('carrito.clear');
 
@@ -101,6 +102,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Gestión de usuarios / personal
         Route::get('/api/usuario/{ci}', [UsuarioController::class, 'getUsuario']);
         Route::resource('usuarios', UsuarioController::class);
+
+        // Gestión de Proveedores
+        Route::resource('proveedores', \App\Http\Controllers\Admin\ProveedorController::class)->names('admin.proveedores');
+
+        // Gestión de Compras (CU14)
+        Route::get('/compras', [\App\Http\Controllers\Admin\CompraController::class, 'index'])->name('admin.compras.index');
+        Route::get('/compras/crear', [\App\Http\Controllers\Admin\CompraController::class, 'create'])->name('admin.compras.create');
+        Route::post('/compras', [\App\Http\Controllers\Admin\CompraController::class, 'store'])->name('admin.compras.store');
+        Route::get('/api/proveedores/buscar/{ci}', [\App\Http\Controllers\Admin\CompraController::class, 'buscarProveedor']);
+        Route::post('/api/proveedores/rapido', [\App\Http\Controllers\Admin\CompraController::class, 'registrarProveedorRapido'])->name('admin.proveedores.rapido');
+        Route::post('/api/productos/rapido', [\App\Http\Controllers\Admin\CompraController::class, 'registrarProductoRapido'])->name('admin.productos.rapido');
 
         // Crear roles y asignar trabajos
         Route::post('/trabajos/rol', [TrabajoController::class, 'store'])->name('trabajos.store');
