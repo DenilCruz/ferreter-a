@@ -88,6 +88,18 @@
                 @endforeach
             </ul>
         @endif
+        <div style="margin-top: 24px; padding: 18px; border-radius: 18px; border: 1px solid var(--border); background: #f8fafc;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
+                <div>
+                    <h4 style="margin: 0 0 8px 0; font-size: 1rem; color: var(--text-main);">Alquiler de maquinaria</h4>
+                    <p style="margin: 0; color: var(--muted); font-size: 0.9rem; line-height: 1.5;">Ver el catálogo completo de maquinaria y elige la que quieres alquilar.</p>
+                </div>
+                <a href="{{ route('maquinarias.catalogo') }}" style="padding: 10px 14px; border-radius: 12px; background: var(--primary); color: white; text-decoration: none; font-weight: 700; white-space: nowrap;">Ver catálogo</a>
+            </div>
+            <p style="margin: 14px 0 0 0; color: {{ $maquinasDisponibles > 0 ? 'var(--muted)' : 'var(--danger)' }}; font-size: 0.85rem;">
+                {{ $maquinasDisponibles > 0 ? "$maquinasDisponibles maquinaria(s) disponible(s) para alquiler." : 'No hay maquinaria disponible para alquiler en este momento.' }}
+            </p>
+        </div>
     </aside>
 
     {{-- ── PANEL DERECHO ── --}}

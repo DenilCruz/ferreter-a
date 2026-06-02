@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Categoria;
+use App\Models\Maquinaria;
 use App\Models\Producto;
 use App\Models\Bitacora;
 use Illuminate\Http\Request;
@@ -62,7 +63,9 @@ class CategoriaController extends Controller
             ->withCount('productos')
             ->get();
 
-        return view('categorias.productos', compact('categoria', 'productos', 'subcategorias', 'orden', 'perPage'));
+        $maquinasDisponibles = Maquinaria::where('estado', 'disponible')->count();
+
+        return view('categorias.productos', compact('categoria', 'productos', 'subcategorias', 'orden', 'perPage', 'maquinasDisponibles'));
     }
 
     // ── ADMIN ──────────────────────────────────────────────────────────────────

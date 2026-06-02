@@ -6,7 +6,6 @@
     <title>@yield('title', 'Ferretería Guisella')</title>
     <link href="{{ asset('css/ferreteria.css') }}" rel="stylesheet">
     @stack('head')
-    <!-- Alpine.js (para los modales y botones) -->
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 <body class="fg-body has-topbar" x-data="{ mobileMenuOpen: false, sidebarOpen: false }">
@@ -59,46 +58,37 @@
         </button>
 
         {{-- Enlaces Escritorio --}}
+       {{-- Enlaces Escritorio --}}
         <div class="topbar-links desktop-only">
+            {{-- ENLACES PÚBLICOS - SIEMPRE VISIBLES PARA TODOS --}}
+            <a href="{{ url('/') }}" class="{{ request()->is('/') ? 'active' : '' }}">Catálogo</a>
+            <a href="{{ route('marcas.index') }}" class="{{ request()->routeIs('marcas.*') ? 'active' : '' }}">Marcas</a>
+            <a href="{{ route('categorias.index') }}" class="{{ request()->routeIs('categorias.*') ? 'active' : '' }}">Categorías</a>
+            
+            {{-- ESTE BOTÓN YA NO DEPENDE DE NINGÚN IF, APARECERÁ SÍ O SÍ --}}
+            <a href="{{ url('/alquileres') }}" class="{{ request()->is('alquileres*') ? 'active' : '' }}">Alquiler de Maquinaria</a>
+
             <a href="{{ route('carrito.index') }}" class="cart-link" style="display: flex; align-items: center; gap: 6px;">
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
                 Carrito
                 @if($cartCount > 0)
                     <span class="cart-count-badge" style="background: var(--primary); color: white; border-radius: 10px; padding: 2px 6px; font-size: 0.7rem; font-weight: bold;">{{ $cartCount }}</span>
-                @else
-                    <span class="cart-count-badge" style="background: var(--primary); color: white; border-radius: 10px; padding: 2px 6px; font-size: 0.7rem; font-weight: bold; display: none;">0</span>
                 @endif
             </a>
 
             @auth
-                @if(!$showSidebar)
-                    {{-- Inventario visible para todos (no admin) --}}
-                    <a href="{{ url('/') }}" class="{{ request()->is('/') ? 'active' : '' }}">Catálogo</a>
-                    <a href="{{ route('marcas.index') }}" class="{{ request()->routeIs('marcas.*') ? 'active' : '' }}">Marcas</a>
-                    <a href="{{ route('categorias.index') }}" class="{{ request()->routeIs('categorias.*') ? 'active' : '' }}">Categorías</a>
-                @endif
-
-                {{-- Solo personal operativo (Admin y Almaceneros) ven Trabajos --}}
+                {{-- Solo personal operativo ve el resto de opciones de gestión si no hay sidebar --}}
                 @unless(Auth::user()->tipoPersona === 'C')
                     @if(!$showSidebar)
                         <a href="{{ route('trabajos.index') }}" class="{{ request()->routeIs('trabajos.index') ? 'active' : '' }}">Trabajos</a>
                         <a href="{{ route('ventas.index') }}" class="{{ request()->routeIs('ventas.*') ? 'active' : '' }}">Ventas</a>
-                        @can('admin')
-                            <a href="{{ route('admin.marcas.index') }}" class="{{ request()->routeIs('admin.marcas.*') ? 'active' : '' }}">Marcas Admin</a>
-                            <a href="{{ route('admin.categorias.index') }}" class="{{ request()->routeIs('admin.categorias.*') ? 'active' : '' }}">Categorías Admin</a>
-                            <a href="{{ route('usuarios.index') }}" class="{{ request()->routeIs('usuarios.*') ? 'active' : '' }}">Personal</a>
-                            <a href="{{ route('bitacora.index') }}" class="{{ request()->routeIs('bitacora.*') ? 'active' : '' }}">Bitácora</a>
-                            <a href="{{ route('caja.index') }}" class="{{ request()->routeIs('caja.*') ? 'active' : '' }}">Caja</a>
-                        @endcan
+                        <a href="{{ route('maquinarias.index') }}" class="{{ request()->routeIs('maquinarias.*') ? 'active' : '' }}">Maquinarias</a>
                     @endif
                 @endunless
 
-                {{-- Info del usuario y logout --}}
                 <span class="topbar-sep">|</span>
                 <span class="topbar-user">
-                    @can('admin')
-                        <span class="topbar-role-badge">Admin</span>
-                    @endcan
+                    @can('admin') <span class="topbar-role-badge">Admin</span> @endcan
                     {{ Auth::user()->name }}
                 </span>
                 <a href="{{ route('dashboard') }}">Mi perfil</a>
@@ -108,9 +98,6 @@
                 </form>
             @else
                 {{-- Visitante no autenticado --}}
-                <a href="{{ url('/') }}" class="{{ request()->is('/') ? 'active' : '' }}">Catálogo</a>
-                <a href="{{ route('marcas.index') }}" class="{{ request()->routeIs('marcas.*') ? 'active' : '' }}">Marcas</a>
-                <a href="{{ route('categorias.index') }}" class="{{ request()->routeIs('categorias.*') ? 'active' : '' }}">Categorías</a>
                 <a href="{{ route('login') }}">Iniciar sesión</a>
                 <a href="{{ route('register') }}">Registrarse</a>
             @endauth
@@ -134,10 +121,12 @@
                 <a href="{{ url('/') }}" class="{{ request()->is('/') ? 'active' : '' }}">Catálogo</a>
                 <a href="{{ route('marcas.index') }}" class="{{ request()->routeIs('marcas.*') ? 'active' : '' }}">Marcas</a>
                 <a href="{{ route('categorias.index') }}" class="{{ request()->routeIs('categorias.*') ? 'active' : '' }}">Categorías</a>
+                <a href="{{ route('alquileres.index') }}" class="{{ request()->routeIs('alquileres.*') ? 'active' : '' }}">Alquiler de Maquinaria</a>
 
                 @unless(Auth::user()->tipoPersona === 'C')
                     <a href="{{ route('trabajos.index') }}" class="{{ request()->routeIs('trabajos.index') ? 'active' : '' }}">Trabajos</a>
                     <a href="{{ route('ventas.index') }}" class="{{ request()->routeIs('ventas.*') ? 'active' : '' }}">Ventas</a>
+                    <a href="{{ route('maquinarias.index') }}" class="{{ request()->routeIs('maquinarias.*') ? 'active' : '' }}">Maquinarias</a>
 
                     @can('admin')
                         <a href="{{ route('admin.marcas.index') }}" class="{{ request()->routeIs('admin.marcas.*') ? 'active' : '' }}">Marcas Admin</a>
@@ -165,6 +154,7 @@
                 <a href="{{ url('/') }}" class="{{ request()->is('/') ? 'active' : '' }}">Catálogo</a>
                 <a href="{{ route('marcas.index') }}" class="{{ request()->routeIs('marcas.*') ? 'active' : '' }}">Marcas</a>
                 <a href="{{ route('categorias.index') }}" class="{{ request()->routeIs('categorias.*') ? 'active' : '' }}">Categorías</a>
+                <a href="{{ route('alquileres.index') }}">Alquiler de Maquinaria</a>
                 <a href="{{ route('login') }}">Iniciar sesión</a>
                 <a href="{{ route('register') }}">Registrarse</a>
             @endauth
@@ -173,11 +163,9 @@
 
     @if($showSidebar)
     <div class="admin-layout-wrapper">
-        <!-- Sidebar: se oculta o muestra basado en sidebarOpen -->
         <div x-show="sidebarOpen" x-transition.opacity.duration.300ms style="display: none;">
             <x-admin-sidebar />
         </div>
-        <!-- Main Content: ajusta el margen dependiendo de si el sidebar está abierto -->
         <div class="admin-main-content wrap @yield('wrap_class')" :style="sidebarOpen ? 'margin-left: 280px;' : 'margin-left: 0; transition: margin-left 0.3s ease-in-out;'">
     @else
     <div class="wrap @yield('wrap_class')">
@@ -219,8 +207,7 @@
     </div>
 
     @if($showSidebar ?? false)
-    </div> <!-- Cierre del admin-layout-wrapper -->
-    @endif
+    </div> @endif
 
     @stack('scripts')
     
