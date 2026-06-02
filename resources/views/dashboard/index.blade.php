@@ -19,7 +19,7 @@
 
     @if($isAdmin)
         {{-- ═══════════════════════════════════════════════ --}}
-        {{-- VISTA ADMINISTRADOR                             --}}
+        {{-- VISTA ADMINISTRADORRR                             --}}
         {{-- ═══════════════════════════════════════════════ --}}
 
         {{-- Tarjetas de Estadísticas --}}
