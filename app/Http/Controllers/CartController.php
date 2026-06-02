@@ -300,4 +300,51 @@ class CartController extends Controller
 
         return view('carrito.success');
     }
+
+    public function generarCotizacion()
+    {
+        $this->mergeSessionCart();
+
+        $cartItems = [];
+        $total = 0;
+
+        if (Auth::check()) {
+            $items = Carrito::with('producto')->where('ci_usuario', Auth::user()->ci)->get();
+            foreach ($items as $item) {
+                if ($item->producto) {
+                    $subtotal = $item->producto->precio * $item->cantidad;
+                    $cartItems[] = [
+                        'idproducto' => $item->idproducto,
+                        'nombre' => $item->producto->nombre,
+                        'precio' => $item->producto->precio,
+                        'cantidad' => $item->cantidad,
+                        'subtotal' => $subtotal
+                    ];
+                    $total += $subtotal;
+                }
+            }
+        } else {
+            $sessionCart = session()->get('carrito', []);
+            foreach ($sessionCart as $idproducto => $item) {
+                $producto = Producto::find($idproducto);
+                if ($producto) {
+                    $subtotal = $producto->precio * $item['cantidad'];
+                    $cartItems[] = [
+                        'idproducto' => $idproducto,
+                        'nombre' => $producto->nombre,
+                        'precio' => $producto->precio,
+                        'cantidad' => $item['cantidad'],
+                        'subtotal' => $subtotal
+                    ];
+                    $total += $subtotal;
+                }
+            }
+        }
+
+        if (empty($cartItems)) {
+            return redirect()->route('carrito.index')->with('error', 'Tu carrito está vacío, no se puede generar la cotización.');
+        }
+
+        return view('cotizacion.imprimir', compact('cartItems', 'total'));
+    }
 }

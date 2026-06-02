@@ -22,10 +22,13 @@ Route::get('/marcas/{id}/productos', [MarcaController::class, 'productosPorMarca
 // Categorías públicas
 Route::get('/categorias', [CategoriaController::class, 'indexPublic'])->name('categorias.index');
 Route::get('/categorias/{id}/productos', [CategoriaController::class, 'productosPorCategoria'])->name('categorias.productos');
+// Catálogo público de maquinarias (disponibles para alquiler)
+Route::get('/maquinarias/catalogo', [\App\Http\Controllers\MaquinariaController::class, 'indexPublic'])->name('maquinarias.catalogo');
 // Rutas de Carrito (Públicas y para Auth)
 Route::get('/carrito', [CartController::class, 'index'])->name('carrito.index');
 Route::post('/carrito/add', [CartController::class, 'add'])->name('carrito.add');
 Route::post('/carrito/update', [CartController::class, 'update'])->name('carrito.update');
+Route::get('/carrito/cotizacion', [CartController::class, 'generarCotizacion'])->name('cotizacion.generar');
 Route::post('/carrito/remove', [CartController::class, 'remove'])->name('carrito.remove');
 Route::post('/carrito/clear', [CartController::class, 'clear'])->name('carrito.clear');
 
@@ -68,6 +71,24 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Trabajos y asignaciones (cualquier empleado autenticado, la vista filtra por rol)
     Route::get('/trabajos', [TrabajoController::class, 'index'])->name('trabajos.index');
 
+    // Alquileres de Maquinaria
+    Route::resource('maquinarias', \App\Http\Controllers\MaquinariaController::class);
+    Route::get('/alquileres', [\App\Http\Controllers\AlquilerController::class, 'index'])->name('alquileres.index');
+    Route::get('/alquileres/crear', [\App\Http\Controllers\AlquilerController::class, 'create'])->name('alquileres.create');
+    Route::post('/alquileres', [\App\Http\Controllers\AlquilerController::class, 'store'])->name('alquileres.store');
+    Route::get('/alquileres/{id}', [\App\Http\Controllers\AlquilerController::class, 'show'])->name('alquileres.show');
+    Route::post('/alquileres/{id}/devolucion', [\App\Http\Controllers\AlquilerController::class, 'registrarDevolucion'])->name('alquileres.devolucion');
+    Route::get('/alquileres/{id}/comprobante', [\App\Http\Controllers\AlquilerController::class, 'imprimir'])->name('alquileres.comprobante');
+
+    // Ventas en tienda (POS) para cajeros y secretarias
+    Route::get('/ventas', [\App\Http\Controllers\VentaController::class, 'index'])->name('ventas.index');
+    Route::get('/ventas/crear', [\App\Http\Controllers\VentaController::class, 'create'])->name('ventas.create');
+    Route::post('/ventas', [\App\Http\Controllers\VentaController::class, 'store'])->name('ventas.store');
+    Route::get('/api/clientes/buscar/{ci}', [\App\Http\Controllers\VentaController::class, 'buscarCliente']);
+    Route::post('/api/clientes/rapido', [\App\Http\Controllers\VentaController::class, 'registrarCliente'])->name('clientes.rapido');
+    Route::get('/ventas/comprobante/{nro}', [\App\Http\Controllers\VentaController::class, 'imprimir'])->name('ventas.comprobante');
+
+
     // ─────────────────────────────────────────────────────
     // SOLO ADMIN — requieren login + ser administrador
     // ─────────────────────────────────────────────────────
@@ -92,6 +113,21 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Gestión de usuarios / personal
         Route::get('/api/usuario/{ci}', [UsuarioController::class, 'getUsuario']);
         Route::resource('usuarios', UsuarioController::class);
+
+        // Gestión de Proveedores
+        Route::resource('proveedores', \App\Http\Controllers\Admin\ProveedorController::class)->names('admin.proveedores');
+
+        // Gestión de Compras (CU14)
+        Route::get('/compras', [\App\Http\Controllers\Admin\CompraController::class, 'index'])->name('admin.compras.index');
+        Route::get('/compras/crear', [\App\Http\Controllers\Admin\CompraController::class, 'create'])->name('admin.compras.create');
+        Route::post('/compras', [\App\Http\Controllers\Admin\CompraController::class, 'store'])->name('admin.compras.store');
+        Route::get('/api/proveedores/buscar/{ci}', [\App\Http\Controllers\Admin\CompraController::class, 'buscarProveedor']);
+        Route::post('/api/proveedores/rapido', [\App\Http\Controllers\Admin\CompraController::class, 'registrarProveedorRapido'])->name('admin.proveedores.rapido');
+        Route::post('/api/productos/rapido', [\App\Http\Controllers\Admin\CompraController::class, 'registrarProductoRapido'])->name('admin.productos.rapido');
+
+        // Gestión de Inventario (CU13)
+        Route::get('/inventario', [\App\Http\Controllers\Admin\InventarioController::class, 'index'])->name('admin.inventario.index');
+        Route::post('/inventario/ajustar', [\App\Http\Controllers\Admin\InventarioController::class, 'ajustarStock'])->name('admin.inventario.ajustar');
 
         // Crear roles y asignar trabajos
         Route::post('/trabajos/rol', [TrabajoController::class, 'store'])->name('trabajos.store');

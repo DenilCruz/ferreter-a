@@ -12,7 +12,7 @@ class Cliente extends Model
     protected $keyType = 'string';
     public $timestamps = false;
 
-    protected $fillable = ['ci', 'puntos'];
+    protected $fillable = ['ci', 'puntos', 'categoria'];
 
     public function usuario()
     {

@@ -45,4 +45,29 @@ class Usuario extends Authenticatable
     {
         return $this->hasOne(Empleado::class, 'ci', 'ci');
     }
+
+    /**
+     * Relación con los datos de cliente (si es tipoPersona = 'C')
+     */
+    public function cliente()
+    {
+        return $this->hasOne(Cliente::class, 'ci', 'ci');
+    }
+
+    /**
+     * Ventas en las que el usuario actúa como cliente
+     */
+    public function facturasCliente()
+    {
+        return $this->hasMany(FacturaVenta::class, 'ci_cliente', 'ci');
+    }
+
+    /**
+     * Ventas realizadas por el usuario en calidad de empleado/cajero
+     */
+    public function facturasCajero()
+    {
+        return $this->hasMany(FacturaVenta::class, 'ci_empleado', 'ci');
+    }
 }
+

@@ -78,6 +78,7 @@
                         byId('study-name').textContent = u.nombre + ' ' + (u.apellido || '');
                         byId('study-mail').textContent = u.correo;
                         byId('study-tipo').textContent = u.tipoPersona;
+                        byId('study-categoria').textContent = (u.cliente && u.cliente.categoria) ? u.cliente.categoria : (u.tipoPersona === 'C' ? 'Sin categoría' : 'N/A');
 
                         const taskList = byId('study-tasks');
                         taskList.textContent = '';
@@ -143,6 +144,7 @@
                             byId('modcorreo').value = u.correo;
                             byId('moddomicilio').value = u.domicilio || '';
                             byId('modtipo').value = u.tipoPersona || '';
+                            byId('modcategoria').value = (u.cliente && u.cliente.categoria) ? u.cliente.categoria : '';
 
                             const form = byId('form-modificar');
                             if (form) form.action = '/usuarios/' + encodeURIComponent(ci);
