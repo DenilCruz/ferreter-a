@@ -125,6 +125,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/api/proveedores/rapido', [\App\Http\Controllers\Admin\CompraController::class, 'registrarProveedorRapido'])->name('admin.proveedores.rapido');
         Route::post('/api/productos/rapido', [\App\Http\Controllers\Admin\CompraController::class, 'registrarProductoRapido'])->name('admin.productos.rapido');
 
+        // Gestión de Inventario (CU13)
+        Route::get('/inventario', [\App\Http\Controllers\Admin\InventarioController::class, 'index'])->name('admin.inventario.index');
+        Route::post('/inventario/ajustar', [\App\Http\Controllers\Admin\InventarioController::class, 'ajustarStock'])->name('admin.inventario.ajustar');
+
         // Crear roles y asignar trabajos
         Route::post('/trabajos/rol', [TrabajoController::class, 'store'])->name('trabajos.store');
         Route::post('/trabajos/asignar', [TrabajoController::class, 'asignar'])->name('trabajos.asignar');
