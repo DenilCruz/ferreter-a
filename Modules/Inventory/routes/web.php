@@ -12,9 +12,11 @@ Route::middleware(['web'])->group(function () {
     Route::get('/catalogo/producto/{id}', [ProductoController::class, 'showPublic'])->name('producto.show');
 
     // Marcas públicas
+    Route::get('/marcas', [MarcaController::class, 'indexPublic'])->name('marcas.index');
     Route::get('/marcas/{id}/productos', [MarcaController::class, 'productosPorMarca'])->name('marcas.productos');
 
     // Categorías públicas
+    Route::get('/categorias', [CategoriaController::class, 'indexPublic'])->name('categorias.index');
     Route::get('/categorias/{id}/productos', [CategoriaController::class, 'productosPorCategoria'])->name('categorias.productos');
 });
 
