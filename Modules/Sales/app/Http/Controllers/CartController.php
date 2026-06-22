@@ -12,6 +12,7 @@ use Modules\Sales\Models\Promocion;
 use Modules\Sales\Models\FacturaVenta;
 use Modules\Sales\Models\DetalleFacturaVenta;
 use Modules\Audit\Models\Bitacora;
+use Modules\Access\Models\Cliente;
 
 class CartController extends Controller
 {
@@ -321,6 +322,13 @@ class CartController extends Controller
             $totalDiscount = collect($discounts)->sum('monto');
             $totalConDescuento = max(0, $total - $totalDiscount);
 
+            // Asegurar que el usuario tenga un registro en la tabla 'cliente'
+            $ci = Auth::user()->ci;
+            Cliente::firstOrCreate(['ci' => $ci], [
+                'puntos' => 0,
+                'categoria' => 'Regular'
+            ]);
+
             // Obtener el siguiente número correlativo para la factura
             $ultimoNro = FacturaVenta::max('nro') ?? 0;
             $nroFactura = $ultimoNro + 1;
@@ -330,7 +338,7 @@ class CartController extends Controller
                 'nro' => $nroFactura,
                 'fecha' => now(),
                 'total' => $totalConDescuento,
-                'ci_cliente' => Auth::user()->ci,
+                'ci_cliente' => $ci,
                 'ci_empleado' => null, // Compra online realizada por el cliente
                 'id_pago' => 2 // Tarjeta de Débito / PayPal
             ]);
