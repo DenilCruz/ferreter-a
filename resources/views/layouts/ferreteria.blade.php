@@ -61,10 +61,10 @@
         </div>
 
             {{-- Search Bar --}}
-            <div class="search-container">
+            <form action="{{ route('inventario') }}" method="GET" class="search-container" style="margin: 0; display: flex; align-items: center;">
                 <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                <input type="text" class="search-input" placeholder="¿Qué estás buscando?">
-            </div>
+                <input type="text" name="buscar" class="search-input" placeholder="¿Qué estás buscando?" value="{{ request('buscar') }}">
+            </form>
 
             {{-- Acciones (Usuario, Carrito) --}}
             <div class="topbar-actions">

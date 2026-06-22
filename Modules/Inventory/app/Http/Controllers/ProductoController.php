@@ -17,12 +17,30 @@ class ProductoController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        // 1. Cargamos las categorías raíces con sus productos y subcategorías
-        $categorias = Categoria::whereNull('id_categoria_padre')
-                        ->with(['subcategorias', 'productos'])
-                        ->get();
+        $buscar = $request->input('buscar');
+
+        if ($buscar) {
+            // Crear una categoría virtual para contener los resultados de la búsqueda
+            $categoriaVirtual = new Categoria();
+            $categoriaVirtual->idcategoria = 9999;
+            $categoriaVirtual->nombre = "Resultados de búsqueda para: \"{$buscar}\"";
+
+            $productos = Producto::where('nombre', 'LIKE', "%{$buscar}%")
+                            ->orWhere('descripcion', 'LIKE', "%{$buscar}%")
+                            ->get();
+
+            $categoriaVirtual->setRelation('productos', $productos);
+            $categoriaVirtual->setRelation('subcategorias', collect());
+
+            $categorias = collect([$categoriaVirtual]);
+        } else {
+            // 1. Cargamos las categorías raíces con sus productos y subcategorías
+            $categorias = Categoria::whereNull('id_categoria_padre')
+                            ->with(['subcategorias', 'productos'])
+                            ->get();
+        }
                         
         // 2. Cargamos todas las categorías para los select de los formularios
         $categorias_formulario = Categoria::all();
