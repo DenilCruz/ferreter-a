@@ -7,7 +7,7 @@ use Modules\Inventory\Models\Producto;
 
 class DetalleNotaCompra extends Model
 {
-    protected $table = 'detallenotacompra';
+    protected $table = 'detalleNotaCompra';
     
     protected $primaryKey = null;
     public $incrementing = false;

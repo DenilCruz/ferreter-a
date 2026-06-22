@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class FacturaVenta extends Model
 {
-    protected $table = 'notaventa';
+    protected $table = 'NotaVenta';
     protected $primaryKey = 'nro';
     public $incrementing = false;
     protected $keyType = 'int';

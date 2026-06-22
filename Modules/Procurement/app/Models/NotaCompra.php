@@ -7,7 +7,7 @@ use Modules\Sales\Models\MetodoPago;
 
 class NotaCompra extends Model
 {
-    protected $table = 'notacompra';
+    protected $table = 'NotaCompra';
     protected $primaryKey = 'nro';
     public $incrementing = false;
     protected $keyType = 'int';

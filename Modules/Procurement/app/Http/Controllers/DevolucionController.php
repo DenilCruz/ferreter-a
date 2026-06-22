@@ -62,7 +62,7 @@ class DevolucionController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nro_factura' => 'required|exists:notaventa,nro',
+            'nro_factura' => 'required|exists:NotaVenta,nro',
             'tipo' => 'required|in:Devolución,Garantía',
             'motivo' => 'required|string|max:500',
             'productos' => 'required|array|min:1',

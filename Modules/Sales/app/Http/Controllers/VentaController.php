@@ -147,7 +147,7 @@ class VentaController extends Controller
     {
         $request->validate([
             'ci_cliente' => 'required|exists:usuario,ci',
-            'id_pago' => 'required|exists:metodopago,id',
+            'id_pago' => 'required|exists:metodoPago,id',
             'productos' => 'required|array|min:1',
             'productos.*.id' => 'required|exists:producto,idproducto',
             'productos.*.cantidad' => 'required|integer|min:1',

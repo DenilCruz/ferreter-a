@@ -67,7 +67,7 @@ class AlquilerController extends Controller
 
         $request->validate([
             'ci_cliente' => 'required|exists:usuario,ci',
-            'metodo_pago_id' => 'required|exists:metodopago,id',
+            'metodo_pago_id' => 'required|exists:metodoPago,id',
             'fecha_inicio' => 'required|date',
             'fecha_fin_estimada' => 'required|date|after:fecha_inicio',
             'garantizado_con' => 'required|string|max:255',

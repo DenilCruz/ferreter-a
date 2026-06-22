@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class MetodoPago extends Model
 {
-    protected $table = 'metodopago';
+    protected $table = 'metodoPago';
     protected $primaryKey = 'id';
     public $incrementing = false;
     public $timestamps = false;

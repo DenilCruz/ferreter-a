@@ -5,9 +5,13 @@ namespace Modules\Sales\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Modules\Inventory\Models\Producto;
 use Modules\Sales\Models\Carrito;
 use Modules\Sales\Models\Promocion;
+use Modules\Sales\Models\FacturaVenta;
+use Modules\Sales\Models\DetalleFacturaVenta;
+use Modules\Audit\Models\Bitacora;
 
 class CartController extends Controller
 {
@@ -287,25 +291,91 @@ class CartController extends Controller
         $this->mergeSessionCart();
 
         // Verificar que hay items
-        $items = Carrito::where('ci_usuario', Auth::user()->ci)->get();
+        $items = Carrito::with('producto')->where('ci_usuario', Auth::user()->ci)->get();
         if ($items->isEmpty()) {
             return redirect()->route('carrito.index')->with('error', 'Tu carrito está vacío.');
         }
 
-        // Descontar la cantidad de stock en cada producto
-        foreach ($items as $item) {
-            $producto = Producto::find($item->idproducto);
-            if ($producto) {
-                // Previene que quede en negativo si hay menos stock del pedido
-                $producto->cantidad = max(0, $producto->cantidad - $item->cantidad);
-                $producto->save();
+        DB::beginTransaction();
+
+        try {
+            // Calcular totales y descuentos
+            $cartItems = [];
+            $total = 0;
+
+            foreach ($items as $item) {
+                if ($item->producto) {
+                    $subtotal = $item->producto->precio * $item->cantidad;
+                    $cartItems[] = [
+                        'idproducto' => $item->idproducto,
+                        'nombre' => $item->producto->nombre,
+                        'precio' => $item->producto->precio,
+                        'cantidad' => $item->cantidad,
+                        'subtotal' => $subtotal
+                    ];
+                    $total += $subtotal;
+                }
             }
+
+            $discounts = $this->getCartDiscounts($cartItems);
+            $totalDiscount = collect($discounts)->sum('monto');
+            $totalConDescuento = max(0, $total - $totalDiscount);
+
+            // Obtener el siguiente número correlativo para la factura
+            $ultimoNro = FacturaVenta::max('nro') ?? 0;
+            $nroFactura = $ultimoNro + 1;
+
+            // Crear la Factura de Venta (NotaVenta)
+            $factura = FacturaVenta::create([
+                'nro' => $nroFactura,
+                'fecha' => now(),
+                'total' => $totalConDescuento,
+                'ci_cliente' => Auth::user()->ci,
+                'ci_empleado' => null, // Compra online realizada por el cliente
+                'id_pago' => 2 // Tarjeta de Débito / PayPal
+            ]);
+
+            // Descontar la cantidad de stock en cada producto y crear detalles
+            foreach ($items as $item) {
+                $producto = Producto::find($item->idproducto);
+                if ($producto) {
+                    if ($producto->cantidad < $item->cantidad) {
+                        throw new \Exception("Stock insuficiente para el producto: {$producto->nombre}.");
+                    }
+                    // Previene que quede en negativo
+                    $producto->cantidad -= $item->cantidad;
+                    $producto->save();
+
+                    // Crear detalle de venta
+                    DetalleFacturaVenta::create([
+                        'nro_factura' => $nroFactura,
+                        'id_producto' => $item->idproducto,
+                        'precio_unitario' => $producto->precio,
+                        'cantidad' => $item->cantidad,
+                        'descuento' => 0.00
+                    ]);
+                }
+            }
+
+            // Vaciar el carrito ya que la compra fue "hecha"
+            Carrito::where('ci_usuario', Auth::user()->ci)->delete();
+
+            // Registrar en la Bitácora
+            Bitacora::registrar(
+                'INSERTAR',
+                'notaventa',
+                $nroFactura,
+                "Compra online realizada con éxito por total de " . number_format($totalConDescuento, 2) . " BOB. Cliente CI: " . Auth::user()->ci
+            );
+
+            DB::commit();
+
+            return view('carrito.success');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->route('carrito.index')->with('error', 'Error al procesar la compra: ' . $e->getMessage());
         }
-
-        // Vaciar el carrito ya que la compra fue "hecha"
-        Carrito::where('ci_usuario', Auth::user()->ci)->delete();
-
-        return view('carrito.success');
     }
 
     public function generarCotizacion()
