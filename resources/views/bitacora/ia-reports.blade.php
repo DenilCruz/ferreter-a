@@ -55,17 +55,6 @@
         <p style="margin-top: 15px; font-weight: 600; color: var(--text-muted);">La Inteligencia Artificial está procesando tu consulta...</p>
     </div>
 
-    <!-- Contenedor del Query SQL Generado -->
-    <div id="sql-container" style="display: none; margin-bottom: 20px;" class="animate-fade-up">
-        <div class="card" style="background: #1e293b; color: #f8fafc; border: 1px solid #334155; padding: 16px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 0.8rem; color: #94a3b8; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">
-                <span>Consulta SQL Generada por la IA</span>
-                <span style="background: #0f172a; padding: 2px 8px; border-radius: 4px; border: 1px solid #475569; color: #38bdf8;">Seguro (SELECT)</span>
-            </div>
-            <pre style="margin: 0; font-family: 'Courier New', Courier, monospace; font-size: 0.95rem; white-space: pre-wrap; word-break: break-all; color: #38bdf8; overflow-x: auto; padding: 5px 0;" id="sql-code"></pre>
-        </div>
-    </div>
-
     <!-- Mensaje de Error -->
     <div id="error-container" style="display: none; margin-bottom: 25px;" class="animate-fade-up">
         <div class="alert alert-error" style="border-radius: 12px; padding: 18px; display: flex; gap: 12px; align-items: flex-start;">
@@ -82,7 +71,17 @@
         <div class="card" style="box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
                 <h2 style="margin: 0; font-size: 1.3rem; color: var(--text-main); font-weight: 800;">Resultado del Reporte</h2>
-                <span id="results-count" style="font-weight: 700; font-size: 0.85rem; color: #00af9a; background: rgba(0, 175, 154, 0.1); padding: 4px 12px; border-radius: 20px;">0 registros encontrados</span>
+                <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                    <span id="results-count" style="font-weight: 700; font-size: 0.85rem; color: #00af9a; background: rgba(0, 175, 154, 0.1); padding: 6px 14px; border-radius: 20px;">0 registros encontrados</span>
+                    <button type="button" id="btn-export-csv" class="btn-action" style="padding: 6px 14px; display: flex; align-items: center; gap: 6px; font-weight: 700; border-radius: 8px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        CSV
+                    </button>
+                    <button type="button" id="btn-export-pdf" class="btn-action" style="padding: 6px 14px; display: flex; align-items: center; gap: 6px; font-weight: 700; border-radius: 8px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                        PDF
+                    </button>
+                </div>
             </div>
 
             <div class="table-wrap" style="overflow-x: auto;">
@@ -126,14 +125,18 @@ document.addEventListener('DOMContentLoaded', function() {
     const btnClear = document.getElementById('btn-clear');
     const formIaQuery = document.getElementById('form-ia-query');
     const loadingContainer = document.getElementById('loading-container');
-    const sqlContainer = document.getElementById('sql-container');
-    const sqlCode = document.getElementById('sql-code');
     const errorContainer = document.getElementById('error-container');
     const errorMessage = document.getElementById('error-message');
     const resultsContainer = document.getElementById('results-container');
     const resultsCount = document.getElementById('results-count');
     const tableHead = document.getElementById('table-head');
     const tableBody = document.getElementById('table-body');
+    const btnExportCsv = document.getElementById('btn-export-csv');
+    const btnExportPdf = document.getElementById('btn-export-pdf');
+
+    // Variables globales para guardar los datos actuales de la consulta
+    let currentData = [];
+    let currentColumns = [];
 
     // Manejar el botón de limpiar texto
     inputConsulta.addEventListener('input', function() {
@@ -195,7 +198,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 recognition.stop();
             } else {
                 // Limpiar resultados previos
-                sqlContainer.style.display = 'none';
                 errorContainer.style.display = 'none';
                 resultsContainer.style.display = 'none';
                 
@@ -220,10 +222,12 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!consultaVal) return;
 
         // Reset de la UI
-        sqlContainer.style.display = 'none';
         errorContainer.style.display = 'none';
         resultsContainer.style.display = 'none';
         loadingContainer.style.display = 'block';
+
+        currentData = [];
+        currentColumns = [];
 
         fetch("{{ route('reportes-ia.consultar') }}", {
             method: 'POST',
@@ -238,22 +242,15 @@ document.addEventListener('DOMContentLoaded', function() {
             loadingContainer.style.display = 'none';
 
             if (status !== 200 || !data.success) {
-                // Mostrar error y el código SQL si estuviera disponible
+                // Mostrar error
                 errorContainer.style.display = 'block';
                 errorMessage.textContent = data.message || 'Error desconocido';
-                
-                if (data.query) {
-                    sqlContainer.style.display = 'block';
-                    sqlCode.textContent = data.query;
-                }
                 return;
             }
 
-            // Éxito: mostrar consulta SQL generada
-            if (data.query) {
-                sqlContainer.style.display = 'block';
-                sqlCode.textContent = data.query;
-            }
+            // Guardar datos en variables globales
+            currentData = data.data;
+            currentColumns = data.columns;
 
             // Mostrar resultados
             resultsContainer.style.display = 'block';
@@ -307,6 +304,139 @@ document.addEventListener('DOMContentLoaded', function() {
             errorContainer.style.display = 'block';
             errorMessage.textContent = 'Ocurrió un error al procesar el reporte: ' + err.message;
         });
+    });
+
+    // Exportar a CSV
+    btnExportCsv.addEventListener('click', function() {
+        if (currentData.length === 0) return;
+
+        // BOM UTF-8 para compatibilidad con caracteres especiales (acentos, ñ, etc.) en Excel
+        let csvContent = "\uFEFF";
+        
+        // Agregar cabeceras
+        csvContent += currentColumns.join(",") + "\n";
+        
+        // Agregar filas
+        currentData.forEach(row => {
+            let rowData = currentColumns.map(col => {
+                let cell = (row[col] === null || row[col] === undefined) ? '' : String(row[col]);
+                // Escapar comillas dobles
+                cell = cell.replace(/"/g, '""');
+                // Envolver en comillas si tiene comas, saltos de línea o comillas
+                if (cell.includes(',') || cell.includes('\n') || cell.includes('"')) {
+                    cell = `"${cell}"`;
+                }
+                return cell;
+            });
+            csvContent += rowData.join(",") + "\n";
+        });
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.setAttribute("href", url);
+        link.setAttribute("download", `reporte_ia_${new Date().toISOString().slice(0, 10)}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    });
+
+    // Exportar a PDF (a través de impresión del navegador formateada)
+    btnExportPdf.addEventListener('click', function() {
+        if (currentData.length === 0) return;
+
+        const printWindow = window.open('', '_blank');
+        
+        let html = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Reporte IA - Ferretería Guisella</title>
+            <style>
+                body {
+                    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+                    color: #1e293b;
+                    padding: 30px;
+                }
+                .header {
+                    border-bottom: 2px solid #00af9a;
+                    padding-bottom: 15px;
+                    margin-bottom: 25px;
+                }
+                h1 {
+                    color: #00796b;
+                    margin: 0 0 5px 0;
+                    font-size: 1.8rem;
+                }
+                p.date {
+                    font-size: 0.85rem;
+                    color: #64748b;
+                    margin: 0;
+                    font-weight: 500;
+                }
+                table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin-top: 15px;
+                }
+                th, td {
+                    border: 1px solid #e2e8f0;
+                    padding: 10px 12px;
+                    text-align: left;
+                    font-size: 0.85rem;
+                }
+                th {
+                    background-color: #f1f5f9;
+                    color: #0f172a;
+                    font-weight: 700;
+                }
+                tr:nth-child(even) {
+                    background-color: #f8fafc;
+                }
+                .muted {
+                    color: #94a3b8;
+                    font-style: italic;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                <h1>Reporte Inteligente</h1>
+                <p class="date">Fecha de Emisión: ${new Date().toLocaleString('es-BO')}</p>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        ${currentColumns.map(col => `<th>${col}</th>`).join('')}
+                    </tr>
+                </thead>
+                <tbody>
+                    ${currentData.map(row => `
+                        <tr>
+                            ${currentColumns.map(col => {
+                                let val = row[col];
+                                if (val === null || val === undefined) {
+                                    return '<td class="muted">null</td>';
+                                }
+                                return `<td>${val}</td>`;
+                            }).join('')}
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+            <script>
+                window.onload = function() {
+                    window.print();
+                    setTimeout(function() { window.close(); }, 500);
+                };
+            <\/script>
+        </body>
+        </html>
+        `;
+        
+        printWindow.document.open();
+        printWindow.document.write(html);
+        printWindow.document.close();
     });
 });
 </script>
