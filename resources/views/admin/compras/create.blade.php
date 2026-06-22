@@ -539,6 +539,21 @@
             init() {
                 this.filterSuppliers();
                 this.filterProducts();
+                
+                // Precargar artículos si provienen de un pedido de reabastecimiento
+                @if(isset($preloadedItems) && count($preloadedItems) > 0)
+                    const preloaded = @json($preloadedItems);
+                    preloaded.forEach(item => {
+                        this.cart.push({
+                            id: item.idproducto,
+                            nombre: item.nombre,
+                            stock_actual: item.stock_actual,
+                            cantidad: item.cantidad,
+                            precio_unitario: item.precio_unitario
+                        });
+                    });
+                    this.showToast('Artículos del pedido cargados.');
+                @endif
             },
             
             // Filtro de proveedores interactivo
@@ -697,11 +712,18 @@
                 if (this.cart.length === 0 || !this.selectedSupplier) return;
                 
                 this.loading = true;
+
+                const urlParams = new URLSearchParams(window.location.search);
+                const pedidoId = urlParams.get('pedido_id');
                 
                 const payload = {
                     ci_proveedor: this.selectedSupplier.ci,
                     productos: this.cart
                 };
+
+                if (pedidoId) {
+                    payload.pedido_id = pedidoId;
+                }
                 
                 fetch('{{ route("admin.compras.store") }}', {
                     method: 'POST',

@@ -251,13 +251,15 @@
                     <span>Subtotal:</span>
                     <span>{{ number_format($total, 2) }} Bs.</span>
                 </div>
-                <div class="totals-row">
+                @if(isset($totalDiscount) && $totalDiscount > 0)
+                <div class="totals-row" style="color: #ef4444; font-weight: 600;">
                     <span>Descuento:</span>
-                    <span>0.00 Bs.</span>
+                    <span>-{{ number_format($totalDiscount, 2) }} Bs.</span>
                 </div>
+                @endif
                 <div class="totals-row grand-total">
                     <span>TOTAL:</span>
-                    <span>{{ number_format($total, 2) }} Bs.</span>
+                    <span>{{ number_format(isset($totalConDescuento) ? $totalConDescuento : $total, 2) }} Bs.</span>
                 </div>
             </div>
         </div>

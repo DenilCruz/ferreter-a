@@ -34,6 +34,12 @@
                 <textarea name="descripcion" rows="3" placeholder="Características técnicas, materiales, etc...">{{ old('descripcion') }}</textarea>
             </div>
 
+            <div class="field" style="grid-column: 1 / -1;">
+                <label>URL de la Imagen (opcional)</label>
+                <input type="url" name="imagen" value="{{ old('imagen') }}" placeholder="https://ejemplo.com/imagen.jpg">
+                @error('imagen') <p class="error-text">{{ $message }}</p> @enderror
+            </div>
+
             <div class="field">
                 <label>Precio de Venta (Bs)</label>
                 <input type="number" step="0.01" name="precio" value="{{ old('precio') }}" placeholder="0.00" required>

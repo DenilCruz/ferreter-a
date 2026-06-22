@@ -14,8 +14,12 @@
 
     <div class="card" style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; padding: 40px;">
         {{-- Lado Izquierdo: Imagen --}}
-        <div style="background: var(--bg-light); border-radius: 16px; min-height: 350px; display: flex; align-items: center; justify-content: center; position: relative;">
-            <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="var(--border)" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+        <div style="background: var(--bg-light); border-radius: 16px; min-height: 350px; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden;">
+            @if($producto->imagen)
+                <img src="{{ $producto->imagen }}" alt="{{ $producto->nombre }}" style="width: 100%; height: 100%; object-fit: cover;">
+            @else
+                <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="var(--border)" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+            @endif
             @if($producto->cantidad <= 0)
                 <span class="badge-pill" style="position: absolute; top: 20px; right: 20px; background: var(--danger); color: white;">Agotado</span>
             @endif

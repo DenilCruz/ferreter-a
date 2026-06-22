@@ -79,11 +79,27 @@
                 <div style="background: var(--bg-light); padding: 24px; border-radius: var(--radius-md); min-width: 300px;">
                     <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-weight: 600;">
                         <span>Subtotal:</span>
-                        <span class="cart-total">{{ number_format($total, 2) }} Bs.</span>
+                        <span>{{ number_format($total, 2) }} Bs.</span>
                     </div>
-                    <div style="display: flex; justify-content: space-between; font-size: 1.5rem; font-weight: 900; color: var(--text-main); margin-bottom: 24px; padding-top: 12px; border-top: 1px dashed var(--border);">
+
+                    {{-- Descuentos de promociones/combos --}}
+                    @if(!empty($discounts))
+                        <div class="cart-discount-section">
+                            @foreach($discounts as $discount)
+                                <div class="cart-discount-item">
+                                    <div class="cart-discount-label">
+                                        <span class="cart-discount-name">🏷️ {{ $discount['nombre'] }}</span>
+                                        <span class="cart-discount-desc">{{ $discount['descripcion'] }}</span>
+                                    </div>
+                                    <span class="cart-discount-amount">-{{ number_format($discount['monto'], 2) }} Bs.</span>
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
+
+                    <div style="display: flex; justify-content: space-between; font-size: 1.5rem; font-weight: 900; color: var(--text-main); margin-bottom: 24px; padding-top: 12px; border-top: 1px dashed var(--border); margin-top: 12px;">
                         <span>Total:</span>
-                        <span class="cart-total" style="color: var(--primary);">{{ number_format($total, 2) }} Bs.</span>
+                        <span class="cart-total" style="color: var(--primary);">{{ number_format($totalConDescuento, 2) }} Bs.</span>
                     </div>
 
                     <!-- Formulario oculto que se enviará cuando PayPal apruebe el pago -->
@@ -130,7 +146,7 @@
                     return actions.order.create({
                         purchase_units: [{
                             amount: {
-                                value: '{{ number_format($total, 2, '.', '') }}' // Formato numérico de javascript sin comas
+                                value: '{{ number_format($totalConDescuento, 2, '.', '') }}' // Formato numérico de javascript sin comas
                             }
                         }]
                     });

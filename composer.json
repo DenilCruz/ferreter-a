@@ -10,6 +10,7 @@
         "barryvdh/laravel-dompdf": "^3.1",
         "laravel/framework": "^11.0",
         "laravel/tinker": "^2.9",
+        "nwidart/laravel-modules": "^13.0",
         "symfony/http-foundation": "^7.0"
     },
     "require-dev": {
@@ -70,6 +71,17 @@
     "extra": {
         "laravel": {
             "dont-discover": []
+        },
+        "merge-plugin": {
+            "include": [
+                "Modules/*/composer.json"
+            ],
+            "recurse": true,
+            "replace": true,
+            "ignore-duplicates": false,
+            "merge-dev": true,
+            "merge-extra": false,
+            "merge-extra-deep": false
         }
     },
     "config": {
@@ -78,7 +90,8 @@
         "sort-packages": true,
         "allow-plugins": {
             "pestphp/pest-plugin": true,
-            "php-http/discovery": true
+            "php-http/discovery": true,
+            "wikimedia/composer-merge-plugin": true
         }
     },
     "minimum-stability": "stable",

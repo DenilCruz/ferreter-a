@@ -25,7 +25,7 @@
     @php
         $cartCount = 0;
         if (Auth::check()) {
-            $cartCount = \App\Models\Carrito::where('ci_usuario', Auth::user()->ci)->sum('cantidad');
+            $cartCount = \Modules\Sales\Models\Carrito::where('ci_usuario', Auth::user()->ci)->sum('cantidad');
         } else {
             $cart = session()->get('carrito', []);
             foreach ($cart as $item) {
@@ -35,8 +35,8 @@
     @endphp
 
     @php
-        $categoriasMenu = \App\Models\Categoria::whereNull('id_categoria_padre')->get();
-        $marcasMenu = \App\Models\Marca::orderBy('nombre')->get();
+        $categoriasMenu = \Modules\Inventory\Models\Categoria::whereNull('id_categoria_padre')->get();
+        $marcasMenu = \Modules\Inventory\Models\Marca::orderBy('nombre')->get();
     @endphp
 
     <div class="topbar-wrapper">
