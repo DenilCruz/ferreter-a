@@ -37,7 +37,7 @@
             <div class="p-6">
                 <h2 class="text-lg font-medium text-slate-900 mb-4">Registrar Nuevo Producto</h2>
                 
-                <form action="{{ route('productos.store') }}" method="POST">
+                <form action="{{ route('productos.store') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="form-grid">
                         <div class="field">
@@ -52,6 +52,10 @@
                         <div class="field" style="grid-column: span 2;">
                             <label class="text-xs font-bold text-slate-500 uppercase">Descripción</label>
                             <input type="text" name="descripcion" value="{{ old('descripcion') }}" placeholder="Detalles técnicos...">
+                        </div>
+                        <div class="field" style="grid-column: span 2;">
+                            <label class="text-xs font-bold text-slate-500 uppercase">Imagen del Producto</label>
+                            <input type="file" name="imagen_file" accept="image/*" style="background: white; padding: 6px; border: 1px solid var(--border);">
                         </div>
                         <div class="field">
                             <label class="text-xs font-bold text-slate-500 uppercase">Precio (Bs)</label>
@@ -96,7 +100,7 @@
                     </x-danger-button>
                 </div>
                 
-                <form id="form-modificar" action="{{ url('productos') }}" method="POST">
+                <form id="form-modificar" action="{{ url('productos') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     @method('PUT')
                     <input type="hidden" id="idproducto-modificar" name="idproducto">
@@ -109,6 +113,10 @@
                         <div class="field" style="grid-column: span 2;">
                             <label class="text-xs font-bold text-slate-500 uppercase">Descripción</label>
                             <input type="text" id="moddescripcion" name="descripcion">
+                        </div>
+                        <div class="field" style="grid-column: span 2;">
+                            <label class="text-xs font-bold text-slate-500 uppercase">Imagen (Dejar en blanco para conservar actual)</label>
+                            <input type="file" name="imagen_file" accept="image/*" style="background: white; padding: 6px; border: 1px solid var(--border);">
                         </div>
                         <div class="field">
                             <label class="text-xs font-bold text-slate-500 uppercase">Precio (Bs)</label>

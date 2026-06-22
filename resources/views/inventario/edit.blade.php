@@ -25,7 +25,7 @@
         </form>
     </div>
 
-    <form action="{{ route('productos.update', $producto->idproducto) }}" method="POST" class="form-container">
+    <form action="{{ route('productos.update', $producto->idproducto) }}" method="POST" class="form-container" enctype="multipart/form-data">
         @csrf
         @method('PUT')
         
@@ -39,6 +39,17 @@
             <div class="field" style="grid-column: 1 / -1;">
                 <label>Descripción</label>
                 <textarea name="descripcion" rows="3" style="resize: vertical;">{{ old('descripcion', $producto->descripcion) }}</textarea>
+            </div>
+
+            <div class="field" style="grid-column: 1 / -1;">
+                <label>Imagen del Producto</label>
+                @if($producto->imagen)
+                    <div style="margin-bottom: 10px;">
+                        <img src="{{ asset('storage/' . $producto->imagen) }}" alt="Imagen actual" style="max-height: 100px; border-radius: 8px; border: 1px solid var(--border);">
+                    </div>
+                @endif
+                <input type="file" name="imagen_file" accept="image/*" style="background: white; padding: 6px; border: 1px solid var(--border); width: 100%; border-radius: 8px;">
+                <small style="color: var(--slate-500); margin-top: 4px; display: block;">Sube una nueva imagen solo si deseas reemplazar la actual.</small>
             </div>
 
             <div class="field">

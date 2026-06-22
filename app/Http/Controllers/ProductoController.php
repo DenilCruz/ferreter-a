@@ -58,7 +58,13 @@ class ProductoController extends Controller
             'cantidad' => ['required', 'integer', 'min:0'],
             'id_marca' => ['required', 'integer'],
             'id_categoria' => ['required', 'integer'],
+            'imagen_file' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp,gif', 'max:2048'],
         ]);
+
+        if ($request->hasFile('imagen_file')) {
+            $path = $request->file('imagen_file')->store('productos', 'public');
+            $validated['imagen'] = $path;
+        }
 
         $producto = \App\Models\Producto::create($validated);
         
@@ -92,6 +98,7 @@ class ProductoController extends Controller
                 'id_color' => ['nullable', 'integer'],
                 'id_medida' => ['nullable', 'integer'],
                 'id_volumen' => ['nullable', 'integer'],
+                'imagen_file' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp,gif', 'max:2048'],
             ],
             [
                 'nombre.required' => 'El nombre del producto es obligatorio.',
@@ -104,6 +111,15 @@ class ProductoController extends Controller
 
         try {
             $producto = \App\Models\Producto::where('idproducto', $id)->firstOrFail();
+
+            if ($request->hasFile('imagen_file')) {
+                if ($producto->imagen && \Illuminate\Support\Facades\Storage::disk('public')->exists($producto->imagen)) {
+                    \Illuminate\Support\Facades\Storage::disk('public')->delete($producto->imagen);
+                }
+                $path = $request->file('imagen_file')->store('productos', 'public');
+                $validated['imagen'] = $path;
+            }
+
             $producto->update($validated);
 
             // REGISTRO EN BITÁCORA
