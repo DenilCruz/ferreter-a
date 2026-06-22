@@ -325,7 +325,6 @@ class CartController extends Controller
             // Asegurar que el usuario tenga un registro en la tabla 'cliente'
             $ci = Auth::user()->ci;
             Cliente::firstOrCreate(['ci' => $ci], [
-                'puntos' => 0,
                 'categoria' => 'Regular'
             ]);
 
