@@ -123,7 +123,7 @@ class DevolucionController extends Controller
     }
 
     /**
-     * Aprobar una devolución (devuelve stock al inventario)
+     * Aprobar una devolución (devuelve stock al inventario y reembolsa el total de la factura)
      */
     public function aprobar($id)
     {
@@ -144,14 +144,70 @@ class DevolucionController extends Controller
                 }
             }
 
+            // Si es de tipo "Devolución", descontamos del total de la factura y actualizamos las cantidades en el detalle
+            if ($devolucion->tipo === 'Devolución') {
+                $factura = FacturaVenta::where('nro', $devolucion->nro_factura)->first();
+                if ($factura) {
+                    $totalDescuentoFactura = 0;
+
+                    foreach ($devolucion->detalles as $detalle) {
+                        // Buscar el detalle de la factura original
+                        $detalleFactura = DB::table('detalleNotaVenta')
+                            ->where('nro_factura', $devolucion->nro_factura)
+                            ->where('id_producto', $detalle->idproducto)
+                            ->first();
+
+                        if ($detalleFactura) {
+                            $cantidadOriginal = (int)$detalleFactura->cantidad;
+                            $cantidadDevuelta = (int)$detalle->cantidad;
+
+                            if ($cantidadOriginal > 0) {
+                                $precioUnitario = (float)$detalleFactura->precio_unitario;
+                                $descuentoOriginal = (float)$detalleFactura->descuento;
+                                
+                                // Precio neto unitario considerando el descuento original de la línea
+                                $precioNetoUnitario = ($precioUnitario * $cantidadOriginal - $descuentoOriginal) / $cantidadOriginal;
+                                
+                                $montoADescontar = $precioNetoUnitario * $cantidadDevuelta;
+                                $totalDescuentoFactura += $montoADescontar;
+
+                                $nuevaCantidad = max(0, $cantidadOriginal - $cantidadDevuelta);
+
+                                if ($nuevaCantidad <= 0) {
+                                    // Si no quedan unidades, eliminamos el registro del detalle de la nota de venta
+                                    DB::table('detalleNotaVenta')
+                                        ->where('nro_factura', $devolucion->nro_factura)
+                                        ->where('id_producto', $detalle->idproducto)
+                                        ->delete();
+                                } else {
+                                    // Si quedan unidades, actualizamos la cantidad y el descuento de forma proporcional
+                                    $nuevoDescuento = $descuentoOriginal - (($descuentoOriginal / $cantidadOriginal) * $cantidadDevuelta);
+                                    DB::table('detalleNotaVenta')
+                                        ->where('nro_factura', $devolucion->nro_factura)
+                                        ->where('id_producto', $detalle->idproducto)
+                                        ->update([
+                                            'cantidad' => $nuevaCantidad,
+                                            'descuento' => round($nuevoDescuento, 2)
+                                        ]);
+                                }
+                            }
+                        }
+                    }
+
+                    // Actualizar el total de la factura
+                    $factura->total = max(0, $factura->total - $totalDescuentoFactura);
+                    $factura->save();
+                }
+            }
+
             $devolucion->estado = 'Aprobado';
             $devolucion->save();
 
-            Bitacora::registrar('ACTUALIZAR', 'devoluciones', $devolucion->id, "Devolución/Garantía Nro. {$devolucion->id} APROBADA. Stock reintegrado al inventario.");
+            Bitacora::registrar('ACTUALIZAR', 'devoluciones', $devolucion->id, "Devolución/Garantía Nro. {$devolucion->id} APROBADA. Stock y factura actualizados.");
 
             DB::commit();
 
-            return back()->with('success', 'Devolución aprobada. El stock ha sido reintegrado al inventario.');
+            return back()->with('success', 'Devolución aprobada. El stock y el total de la factura se actualizaron con éxito.');
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->with('error', 'Error al aprobar: ' . $e->getMessage());

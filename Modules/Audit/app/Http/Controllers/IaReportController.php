@@ -46,6 +46,15 @@ The database tables are:
 11. `bitacora` (id INT, accion VARCHAR, tabla VARCHAR, registro_id VARCHAR, descripcion TEXT, created_at TIMESTAMP)
 12. `cajas` (id INT, user_id INT, monto_apertura DECIMAL, monto_cierre DECIMAL, diferencia DECIMAL, estado VARCHAR, fecha_apertura DATETIME, fecha_cierre DATETIME)
 13. `alquileres` (id INT, ci_cliente INT, ci_empleado INT, fecha_inicio DATETIME, fecha_fin_estimada DATETIME, fecha_devolucion DATETIME, total_estimado DECIMAL, total_real DECIMAL, estado VARCHAR)
+14. `devoluciones` (id INT, nro_factura INT, tipo VARCHAR, motivo TEXT, fecha DATE, estado VARCHAR, ci_empleado INT, observaciones TEXT)
+15. `devolucion_detalles` (id INT, devolucion_id INT, idproducto INT, cantidad INT)
+16. `maquinarias` (id INT, codigo VARCHAR, nombre VARCHAR, descripcion TEXT, precio_hora DECIMAL, precio_dia DECIMAL, garantia_sugerida DECIMAL, estado VARCHAR)
+17. `alquiler_detalles` (id INT, alquiler_id INT, maquinaria_id INT, precio_unitario DECIMAL, tipo_tarifa VARCHAR, tiempo_rentado INT)
+18. `mantenimientos` (id INT, maquinaria_id INT, tipo VARCHAR, descripcion TEXT, costo DECIMAL, fecha_inicio DATE, fecha_fin DATE, estado VARCHAR, ci_responsable INT, observaciones TEXT)
+19. `pedidos_reabastecimiento` (id INT, ci_empleado INT, fecha DATE, estado VARCHAR, observaciones TEXT)
+20. `pedido_reabastecimiento_detalles` (id INT, pedido_id INT, idproducto INT, cantidad_sugerida INT)
+21. `promociones` (id INT, nombre VARCHAR, descripcion TEXT, tipo VARCHAR, descuento_porcentaje DECIMAL, precio_combo DECIMAL, fecha_inicio DATE, fecha_fin DATE, estado VARCHAR)
+22. `promocion_productos` (id INT, promocion_id INT, idproducto INT)
 
 Rules:
 1. Generate ONLY a valid MySQL SELECT query.
