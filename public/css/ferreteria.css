@@ -209,7 +209,7 @@ a:hover { color: var(--primary-hover); }
     gap: 8px;
     background: none;
     border: none;
-    color: white;
+    color: #00AF9A;
     font-size: 0.95rem;
     font-weight: 700;
     cursor: pointer;
@@ -217,7 +217,7 @@ a:hover { color: var(--primary-hover); }
     padding: 8px 0;
 }
 .btn-productos:hover {
-    color: #00AF9A;
+    color: #009984;
 }
 
 .sec-nav-links {

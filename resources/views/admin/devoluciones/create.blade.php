@@ -12,12 +12,12 @@
             Volver al listado
         </a>
         <h1 style="margin: 0; font-size: 2rem;">Registrar Devolución / Garantía</h1>
-        <p class="subtitle" style="margin: 4px 0 0 0;">Busca la factura de venta e indica los productos a devolver o cubrir por garantía.</p>
+        <p class="subtitle" style="margin: 4px 0 0 0;">Busca la nota de venta e indica los productos a devolver o cubrir por garantía.</p>
     </div>
 
     <!-- BUSCAR FACTURA -->
     <div class="card" style="background: white; border-radius: 12px; border: 1px solid var(--border); padding: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
-        <h3 style="margin: 0 0 16px 0; font-size: 1.1rem;">1. Buscar Factura de Venta</h3>
+        <h3 style="margin: 0 0 16px 0; font-size: 1.1rem;">1. Buscar Nota de Venta</h3>
         <div style="display: flex; gap: 12px; align-items: flex-end;">
             <div style="flex: 1;">
                 <label style="font-weight: 700; font-size: 0.85rem; color: #374151; display: block; margin-bottom: 6px;">Número de Factura</label>
