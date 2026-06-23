@@ -116,6 +116,21 @@
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
                             Generar Cotización (PDF)
                         </a>
+
+                        <!-- Botón de Guardar Cotización en Cuenta -->
+                        <form action="{{ route('cotizaciones.guardar') }}" method="POST" style="width: 100%; margin-top: 10px;">
+                            @csrf
+                            <button type="submit" style="display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; background: linear-gradient(135deg, #6366F1, #8B5CF6); color: white; border: none; padding: 14px; border-radius: 12px; font-weight: 700; font-size: 1.05rem; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(99, 102, 241, 0.4)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(99, 102, 241, 0.3)';">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                                Guardar Cotización en Cuenta
+                            </button>
+                        </form>
+
+                        <!-- Botón de Ver Cotizaciones Guardadas -->
+                        <a href="{{ route('cotizaciones.guardadas') }}" style="display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; margin-top: 10px; background: white; color: #6366F1; border: 2px solid #6366F1; padding: 14px; border-radius: 12px; font-weight: 700; font-size: 1.05rem; text-decoration: none; transition: all 0.2s;" onmouseover="this.style.background='#6366F1'; this.style.color='white';" onmouseout="this.style.background='white'; this.style.color='#6366F1';">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                            Ver Cotizaciones Guardadas
+                        </a>
                     @else
                         <a href="{{ route('login') }}" class="btn-save" style="display: block; text-align: center; width: 100%; margin-top: 15px; font-size: 1.1rem; padding: 16px; text-decoration: none;">Iniciar Sesión para Pagar</a>
                     @endauth

@@ -13,6 +13,8 @@ use Modules\Sales\Models\FacturaVenta;
 use Modules\Sales\Models\DetalleFacturaVenta;
 use Modules\Audit\Models\Bitacora;
 use Modules\Access\Models\Cliente;
+use Modules\Sales\Models\Cotizacion;
+use Modules\Sales\Models\CotizacionDetalle;
 
 class CartController extends Controller
 {
@@ -435,6 +437,160 @@ class CartController extends Controller
         $totalConDescuento = max(0, $total - $totalDiscount);
 
         return view('cotizacion.imprimir', compact('cartItems', 'total', 'discounts', 'totalDiscount', 'totalConDescuento'));
+    }
+
+    /**
+     * Guardar el carrito actual como una cotización persistente.
+     */
+    public function guardarCotizacion(Request $request)
+    {
+        $this->mergeSessionCart();
+
+        $ci = Auth::user()->ci;
+        $items = Carrito::with('producto')->where('ci_usuario', $ci)->get();
+
+        if ($items->isEmpty()) {
+            return redirect()->route('carrito.index')->with('error', 'Tu carrito está vacío. No se puede guardar una cotización.');
+        }
+
+        // Calcular items y total
+        $cartItems = [];
+        $total = 0;
+
+        foreach ($items as $item) {
+            if ($item->producto) {
+                $subtotal = $item->producto->precio * $item->cantidad;
+                $cartItems[] = [
+                    'idproducto' => $item->idproducto,
+                    'nombre' => $item->producto->nombre,
+                    'precio' => $item->producto->precio,
+                    'cantidad' => $item->cantidad,
+                    'subtotal' => $subtotal
+                ];
+                $total += $subtotal;
+            }
+        }
+
+        // Aplicar descuentos de promociones activas
+        $discounts = $this->getCartDiscounts($cartItems);
+        $totalDiscount = collect($discounts)->sum('monto');
+        $totalConDescuento = max(0, $total - $totalDiscount);
+
+        DB::beginTransaction();
+        try {
+            // Crear cabecera de cotización
+            $cotizacion = Cotizacion::create([
+                'ci_cliente' => $ci,
+                'fecha' => now()->toDateString(),
+                'total' => $totalConDescuento,
+                'observaciones' => $request->input('observaciones'),
+            ]);
+
+            // Crear detalles
+            foreach ($items as $item) {
+                if ($item->producto) {
+                    CotizacionDetalle::create([
+                        'cotizacion_id' => $cotizacion->id,
+                        'idproducto' => $item->idproducto,
+                        'cantidad' => $item->cantidad,
+                        'precio_unitario' => $item->producto->precio,
+                    ]);
+                }
+            }
+
+            // Registrar en bitácora
+            Bitacora::registrar(
+                'INSERTAR',
+                'cotizaciones',
+                $cotizacion->id,
+                "Cotización #{$cotizacion->id} guardada con total de " . number_format($totalConDescuento, 2) . " BOB. Cliente CI: {$ci}"
+            );
+
+            DB::commit();
+
+            return redirect()->route('cotizaciones.guardadas')->with('success', '¡Cotización guardada exitosamente!');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->route('carrito.index')->with('error', 'Error al guardar la cotización: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Listar todas las cotizaciones guardadas del cliente autenticado.
+     */
+    public function verCotizacionesGuardadas()
+    {
+        $ci = Auth::user()->ci;
+        $cotizaciones = Cotizacion::with('detalles.producto')
+            ->where('ci_cliente', $ci)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('cotizacion.guardadas', compact('cotizaciones'));
+    }
+
+    /**
+     * Cargar una cotización guardada en el carrito activo.
+     */
+    public function cargarCotizacion($id)
+    {
+        $ci = Auth::user()->ci;
+        $cotizacion = Cotizacion::with('detalles.producto')
+            ->where('ci_cliente', $ci)
+            ->findOrFail($id);
+
+        DB::beginTransaction();
+        try {
+            // Vaciar el carrito actual
+            Carrito::where('ci_usuario', $ci)->delete();
+
+            // Insertar los productos de la cotización al carrito
+            foreach ($cotizacion->detalles as $detalle) {
+                if ($detalle->producto && $detalle->producto->cantidad > 0) {
+                    $cantidadDisponible = min($detalle->cantidad, $detalle->producto->cantidad);
+                    Carrito::create([
+                        'ci_usuario' => $ci,
+                        'idproducto' => $detalle->idproducto,
+                        'cantidad' => $cantidadDisponible,
+                    ]);
+                }
+            }
+
+            // Registrar en bitácora
+            Bitacora::registrar(
+                'CONSULTAR',
+                'cotizaciones',
+                $cotizacion->id,
+                "Cotización #{$cotizacion->id} cargada en el carrito. Cliente CI: {$ci}"
+            );
+
+            DB::commit();
+
+            return redirect()->route('carrito.index')->with('success', '¡Cotización cargada en tu carrito! Revisa los productos.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->route('cotizaciones.guardadas')->with('error', 'Error al cargar la cotización: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Eliminar una cotización guardada.
+     */
+    public function eliminarCotizacion($id)
+    {
+        $ci = Auth::user()->ci;
+        $cotizacion = Cotizacion::where('ci_cliente', $ci)->findOrFail($id);
+
+        $cotizacion->delete();
+
+        Bitacora::registrar(
+            'ELIMINAR',
+            'cotizaciones',
+            $id,
+            "Cotización #{$id} eliminada. Cliente CI: {$ci}"
+        );
+
+        return redirect()->route('cotizaciones.guardadas')->with('success', 'Cotización eliminada correctamente.');
     }
 
     /**

@@ -26,6 +26,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::post('/carrito/checkout', [CartController::class, 'checkout'])->name('carrito.checkout');
 
+    // Cotizaciones persistentes
+    Route::post('/cotizaciones/guardar', [CartController::class, 'guardarCotizacion'])->name('cotizaciones.guardar');
+    Route::get('/cotizaciones/guardadas', [CartController::class, 'verCotizacionesGuardadas'])->name('cotizaciones.guardadas');
+    Route::post('/cotizaciones/cargar/{id}', [CartController::class, 'cargarCotizacion'])->name('cotizaciones.cargar');
+    Route::delete('/cotizaciones/{id}', [CartController::class, 'eliminarCotizacion'])->name('cotizaciones.eliminar');
+
     Route::get('/ventas', [VentaController::class, 'index'])->name('ventas.index');
     Route::get('/ventas/crear', [VentaController::class, 'create'])->name('ventas.create');
     Route::post('/ventas', [VentaController::class, 'store'])->name('ventas.store');
