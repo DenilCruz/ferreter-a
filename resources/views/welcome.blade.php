@@ -215,5 +215,11 @@
         @if (Route::has('login'))
             <div class="h-14.5 hidden lg:block"></div>
         @endif
+
+        @if(!Auth::check() || (Auth::user() && (Auth::user()->tipoPersona === 'C' || strtolower(Auth::user()->tipoPersona) === 'cliente')))
+            <!-- Botpress Chatbot -->
+            <script src="https://cdn.botpress.cloud/webchat/v3.6/inject.js"></script>
+            <script src="https://files.bpcontent.cloud/2026/06/23/03/20260623031008-8E69KCVF.js" defer></script>
+        @endif
     </body>
 </html>

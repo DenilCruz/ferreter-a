@@ -223,21 +223,7 @@
         @yield('content')
     </div>
 
-    {{-- Botón Flotante de Acciones (FAB) para Admin --}}
-    @can('admin')
-    <div class="fab-container" x-data="{ fabOpen: false }" style="position: fixed; bottom: 30px; right: 30px; z-index: 1000; display: flex; flex-direction: column; align-items: flex-end; gap: 10px;">
-        <div class="fab-menu" x-show="fabOpen" x-transition.opacity style="display: none; display: flex; flex-direction: column; gap: 8px;">
-            <a href="{{ route('productos.create') }}" style="background: white; color: #00AF9A; padding: 10px 16px; border-radius: 20px; font-weight: 700; font-size: 0.9rem; text-decoration: none; box-shadow: 0 4px 10px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 8px;">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
-                Nuevo Producto
-            </a>
-            <!-- Puedes añadir más opciones al FAB aquí -->
-        </div>
-        <button @click="fabOpen = !fabOpen" style="background: #00AF9A; color: white; width: 56px; height: 56px; border-radius: 50%; border: none; cursor: pointer; box-shadow: 0 4px 15px rgba(0, 175, 154, 0.4); display: flex; align-items: center; justify-content: center; transition: transform 0.2s;" :style="fabOpen ? 'transform: rotate(45deg);' : ''">
-            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-        </button>
-    </div>
-    @endcan
+
 
     @stack('scripts')
     
@@ -339,5 +325,11 @@
             }, 2000);
         }
     </script>
+
+    @if(!Auth::check() || (Auth::user() && (Auth::user()->tipoPersona === 'C' || strtolower(Auth::user()->tipoPersona) === 'cliente')))
+        <!-- Botpress Chatbot -->
+        <script src="https://cdn.botpress.cloud/webchat/v3.6/inject.js"></script>
+        <script src="https://files.bpcontent.cloud/2026/06/23/03/20260623031008-8E69KCVF.js" defer></script>
+    @endif
 </body>
 </html>
